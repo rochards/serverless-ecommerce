@@ -14,4 +14,4 @@
 Os comandos devem ser executados dentro do diretório cdk-infra.
 - `cdk ls`: lista todas as stacks presentes no projeto;
 - `cdk deploy --all`: faz o deploy na sua conta AWS de todas as stacks presentes no projeto;
-- `cdk destroy -all`: remove todos (todas as stacks) os recursos criados na AWS.
+- `cdk destroy --all`: remove todos (todas as stacks) os recursos criados na AWS.
