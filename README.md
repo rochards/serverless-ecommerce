@@ -1,5 +1,10 @@
 # Projeto de um Ecommerce em uma arquitetura Serverless
 
+> Repositório em construção...
+
+A arquitetura abaixo ilustra como ficará o projeto ao ser concluído.  
+![arquitetura do ecommerce](/images/arquitetura-ecommerce.png)
+
 - A infraestrutura da AWS está sendo criada e automatizada utilizando o [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html). A linguagem utilizada no CDK foi o Java;
 - As funções Lambda também estão sendo desenvolvidas na linguagem Java.
 
