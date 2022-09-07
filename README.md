@@ -2,6 +2,7 @@
 
 > Repositório em construção...
 
+Aplicação construída com a finalidade de estudar os recursos disponíveis na AWS. Estou seguindo o curso disponível no link https://www.udemy.com/course/aws-serverless-nodejs-cdk-pt/, porém não estou utilizando o NodeJS para provisionar os recursos nem construir os códigos das aplicações.  
 A arquitetura abaixo ilustra como ficará o projeto ao ser concluído.  
 ![arquitetura do ecommerce](/images/arquitetura-ecommerce.png)
 
