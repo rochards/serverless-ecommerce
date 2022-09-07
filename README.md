@@ -14,7 +14,7 @@ A arquitetura abaixo ilustra como ficará o projeto ao ser concluído.
 - Java 11;
 - Maven 3.8.6;
 - Docker 20.10.17;
-- aws cdk 2.38.1.
+- aws cdk 2.40.0.
 
 ### Comandos interessantes do AWS CDK
 Os comandos devem ser executados dentro do diretório cdk-infra.
