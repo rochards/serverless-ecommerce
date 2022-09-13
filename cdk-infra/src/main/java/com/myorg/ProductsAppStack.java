@@ -24,7 +24,7 @@ public class ProductsAppStack extends Stack {
                                                             o pacote.nome_da_classe pq esta implementa a interface RequestHandler */
                 .memorySize(512)
                 .timeout(Duration.seconds(3))
-                .code(Code.fromAsset(""))
+                .code(Code.fromAsset("../products-lambda/target/products-lambda-1.0-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .build();
     }
