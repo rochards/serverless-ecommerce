@@ -17,7 +17,29 @@ A arquitetura abaixo ilustra como ficará o projeto ao ser concluído.
 - aws cdk 2.40.0.
 
 ### Comandos interessantes do AWS CDK
-Os comandos devem ser executados dentro do diretório cdk-infra.
+Os comandos devem ser executados dentro do diretório `cdk-infra`, pois é onde estão configuradas todas as stacks do projeto:
 - `cdk ls`: lista todas as stacks presentes no projeto;
 - `cdk deploy --all`: faz o deploy na sua conta AWS de todas as stacks presentes no projeto;
 - `cdk destroy --all`: remove todos (todas as stacks) os recursos criados na AWS.
+
+### Operações expostas pelo API Gateway ECommerceAPI
+
+| Operação | Endpoint | Verbo HTTP |
+| -------- | -------- | ---------- |
+| Criar um produto | `/products` | POST |
+| Listar todos os produtos | `/products` | GET |
+| Buscar um produto pelo id | `/products/{id_produto}` | GET |
+| Alterar um produto pelo id | `/products/{id_produto}` | PUT |
+| Apagar um produto pelo id | `/products/{id_produto}` | DELETE |
+
+### Como as lambdas estão sendo empacotadas para o deploy
+
+Dentro do projeto `cdk-infra` deve existir um diretório `lambdas` que é para onde os arquivos `.jar` das lambdas, gerados pelo comando `mvn clean package`, devem ser copiados. Exemplificando com a classe `ProductsAppStack`:
+```java
+public class ProductsAppStack extends Stack {
+    /* ... */
+    .code(Code.fromAsset("lambdas/products/products-lambda-1.0-SNAPSHOT.jar"))
+    /* ... */
+}
+```
+como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infra` exista um diretório `lambdas/products` com o arquivo `products-lambda-1.0-SNAPSHOT.jar`.

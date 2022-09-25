@@ -6,6 +6,7 @@ target
 .settings
 .vscode
 *.iml
+cdk-infra/lambdas
 
 # CDK asset staging directory
 .cdk.staging

@@ -9,7 +9,7 @@ import software.constructs.Construct;
 
 public class ProductsAppStack extends Stack {
 
-    private Function productsFetchHandler;
+    private final Function productsFetchHandler;
 
     public ProductsAppStack(Construct scope, String stackId) {
         super(scope, stackId, null);
@@ -24,8 +24,12 @@ public class ProductsAppStack extends Stack {
                                                             o pacote.nome_da_classe pq esta implementa a interface RequestHandler */
                 .memorySize(512)
                 .timeout(Duration.seconds(3))
-                .code(Code.fromAsset("../products-lambda/target/products-lambda-1.0-SNAPSHOT.jar"))
+                .code(Code.fromAsset("lambdas/products/products-lambda-1.0-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .build();
+    }
+
+    public Function getProductsFetchHandler() {
+        return productsFetchHandler;
     }
 }
