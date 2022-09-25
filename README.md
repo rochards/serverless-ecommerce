@@ -42,4 +42,4 @@ public class ProductsAppStack extends Stack {
     /* ... */
 }
 ```
-como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infra` exista um diretório `lambdas/products` com o arquivo `products-lambda-1.0-SNAPSHOT.jar`. Essa abordagem só é possível enquanto os arquivos forem menor que 50 MB, como descrito em [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).
+como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infra` exista um diretório `lambdas/products` com o arquivo `products-lambda-1.0-SNAPSHOT.jar`. :warning: Essa abordagem só é possível enquanto os arquivos forem menor que 50 MB, como descrito em [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).
