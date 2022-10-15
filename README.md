@@ -34,6 +34,20 @@ A última coluna destaca a função lambda responsável pela operação
 | Alterar um produto pelo id | `/products/{id_produto}` | PUT | products-admin-lambda |
 | Apagar um produto pelo id | `/products/{id_produto}` | DELETE | products-admin-lambda |
 
+### Modelagem da tabela de produtos no DynamoDB
+
+No DynamoDB precisamos apenas de definir a chave primária da tabela, no entanto para facilitar a codificação da aplicação, vamos modelar uma tabela de produtos com os seguintes atributos:
+
+| Atributo | Tipo no DynamoDB |
+| -------- | ---------------- |
+| `Id` (chave primária) | String |
+| `Model` | String |
+| `ProductUrl` | String |
+| `Code` | String |
+| `Price` | Number |
+| `ProductName` | String |
+
+
 ### Como as lambdas estão sendo empacotadas para o deploy
 
 Dentro do projeto `cdk-infra` deve existir um diretório `lambdas` que é para onde os arquivos `.jar` das lambdas, gerados pelo comando `mvn clean package`, devem ser copiados. Exemplificando com a classe `ProductsAppStack`:
