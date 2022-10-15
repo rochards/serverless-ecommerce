@@ -24,13 +24,15 @@ Os comandos devem ser executados dentro do diretório `cdk-infra`, pois é onde 
 
 ### Operações expostas pelo API Gateway ECommerceAPI
 
-| Operação | Endpoint | Verbo HTTP |
-| -------- | -------- | ---------- |
-| Criar um produto | `/products` | POST |
-| Listar todos os produtos | `/products` | GET |
-| Buscar um produto pelo id | `/products/{id_produto}` | GET |
-| Alterar um produto pelo id | `/products/{id_produto}` | PUT |
-| Apagar um produto pelo id | `/products/{id_produto}` | DELETE |
+A última coluna destaca a função lambda responsável pela operação
+
+| Operação | Endpoint | Verbo HTTP | Lambda |
+| -------- | -------- | ---------- | ------ |
+| Criar um produto | `/products` | POST | products-admin-lambda |
+| Listar todos os produtos | `/products` | GET | products-lambda |
+| Buscar um produto pelo id | `/products/{id_produto}` | GET | products-lambda |
+| Alterar um produto pelo id | `/products/{id_produto}` | PUT | products-admin-lambda |
+| Apagar um produto pelo id | `/products/{id_produto}` | DELETE | products-admin-lambda |
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
@@ -42,4 +44,5 @@ public class ProductsAppStack extends Stack {
     /* ... */
 }
 ```
-como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infra` exista um diretório `lambdas/products` com o arquivo `products-lambda-1.0-SNAPSHOT.jar`. :warning: Essa abordagem só é possível enquanto os arquivos forem menor que 50 MB, como descrito em [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).
+como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infra` exista um diretório `lambdas/products` com o arquivo `products-lambda-1.0-SNAPSHOT.jar`.  
+:warning: Essa abordagem só é possível enquanto os arquivos forem menor que 50 MB, como descrito em [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).
