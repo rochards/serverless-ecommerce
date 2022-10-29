@@ -1,0 +1,1 @@
+Configurações do pom da lambda e log4j -> https://github.com/aws/aws-lambda-java-libs/tree/master/aws-lambda-java-log4j2
