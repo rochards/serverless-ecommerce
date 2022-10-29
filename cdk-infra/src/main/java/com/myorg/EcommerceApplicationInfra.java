@@ -9,7 +9,8 @@ public class EcommerceApplicationInfra {
         ProductsAppStack productsAppStack = new ProductsAppStack(app, "ProductsAppStack");
 
         EcommerceApiGtwStack ecommerceApiGtwStack =
-                new EcommerceApiGtwStack(app, "EcommerceApiGtwStack", productsAppStack.getProductsFetchHandler());
+                new EcommerceApiGtwStack(app, "EcommerceApiGtwStack", productsAppStack.getProductsFetchHandler(),
+                        productsAppStack.getProductsAdminHandler());
         ecommerceApiGtwStack.addDependency(productsAppStack);
 
         app.synth();

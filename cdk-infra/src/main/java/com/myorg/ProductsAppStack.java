@@ -25,8 +25,8 @@ public class ProductsAppStack extends Stack {
         super(scope, stackId, null);
 
         this.productsDdbTable = createDynamoDBTable();
-        this.productsFetchHandler = createProductsFetchLambda(this.productsDdbTable.getTableName());
-        this.productsAdminHandler = createProductsAdminLambda(this.productsDdbTable.getTableName());
+        this.productsFetchHandler = createProductsFetchLambda();
+        this.productsAdminHandler = createProductsAdminLambda();
 
         // atribuindo as lambdas permissões de leitura e escrita na tabela
         this.productsDdbTable.grantReadData(this.productsFetchHandler);
@@ -50,10 +50,10 @@ public class ProductsAppStack extends Stack {
                 .build();
     }
 
-    private Function createProductsFetchLambda(String tableName) {
+    private Function createProductsFetchLambda() {
         String lambdaName = "ProductsFetchLambda";
         Map<String, String> envVariables = new HashMap<>();
-        envVariables.put("PRODUCTS_DDB_TABLE", tableName);
+        envVariables.put("PRODUCTS_DDB_TABLE", this.productsDdbTable.getTableName());
 
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
@@ -67,13 +67,14 @@ public class ProductsAppStack extends Stack {
                 .build();
     }
 
-    private Function createProductsAdminLambda(String tableName) {
+    private Function createProductsAdminLambda() {
         String lambdaName = "ProductsAdminLambda";
         Map<String, String> envVariables = new HashMap<>();
-        envVariables.put("PRODUCTS_DDB_TABLE", tableName);
+        envVariables.put("PRODUCTS_DDB_TABLE", this.productsDdbTable.getTableName());
 
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
+                .handler("products.ProductsAdminLambda")
                 .memorySize(512)
                 .timeout(Duration.seconds(3))
                 .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.0-SNAPSHOT.jar"))

@@ -12,9 +12,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
-public class ProductsFetchLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    private static final Logger LOGGER = LogManager.getLogger(ProductsFetchLambda.class);
+    private static final Logger LOGGER = LogManager.getLogger(ProductsAdminLambda.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
@@ -23,11 +23,17 @@ public class ProductsFetchLambda implements RequestHandler<APIGatewayProxyReques
         LOGGER.log(Level.INFO, "API Gateway RequestId: {}", input.getRequestContext().getRequestId());
 
         if (input.getResource().equals("/products/{id}")) {
-            LOGGER.log(Level.INFO, "GET /products/{}", input.getPathParameters().get("id"));
-            return buildResponse("Get /products/{id} Ok");
+            var productId = input.getPathParameters().get("id");
+            if (input.getHttpMethod().equals("PUT")) {
+                LOGGER.log(Level.INFO, "PUT /products/{}", productId);
+                return buildResponse("Put products ok");
+            } else if (input.getHttpMethod().equals("DELETE")) {
+                LOGGER.log(Level.INFO, "DELETE /products/{}", productId);
+                return buildResponse("Delete products ok");
+            }
         }
-
-        return buildResponse("Get products Ok");
+        // chamada em /products
+        return buildResponse("Post products Ok");
     }
 
     private APIGatewayProxyResponseEvent buildResponse(String message) {
