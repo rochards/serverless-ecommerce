@@ -29,7 +29,6 @@ A última coluna destaca a função lambda responsável pela operação
 | Operação | Endpoint | Verbo HTTP | Lambda |
 | -------- | -------- | ---------- | ------ |
 | Criar um produto | `/products` | POST | products-admin-lambda |
-| Listar todos os produtos | `/products` | GET | products-lambda |
 | Buscar um produto pelo id | `/products/{id_produto}` | GET | products-lambda |
 | Alterar um produto pelo id | `/products/{id_produto}` | PUT | products-admin-lambda |
 | Apagar um produto pelo id | `/products/{id_produto}` | DELETE | products-admin-lambda |

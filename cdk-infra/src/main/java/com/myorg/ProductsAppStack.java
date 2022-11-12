@@ -30,7 +30,7 @@ public class ProductsAppStack extends Stack {
 
         // atribuindo as lambdas permissões de leitura e escrita na tabela
         this.productsDdbTable.grantReadData(this.productsFetchHandler);
-        this.productsDdbTable.grantWriteData(this.productsAdminHandler);
+        this.productsDdbTable.grantReadWriteData(this.productsAdminHandler);
     }
 
     private Table createDynamoDBTable() {
@@ -60,8 +60,8 @@ public class ProductsAppStack extends Stack {
                 .handler("products.ProductsFetchLambda") /* igual ao do projeto products-lambda. É permitido referenciar
                                                             o pacote.nome_da_classe pq esta implementa a interface RequestHandler */
                 .memorySize(512)
-                .timeout(Duration.seconds(3))
-                .code(Code.fromAsset("lambdas/products/products-lambda-1.0-SNAPSHOT.jar"))
+                .timeout(Duration.seconds(5))
+                .code(Code.fromAsset("lambdas/products/products-lambda-1.1-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .environment(envVariables)
                 .build();
@@ -76,8 +76,8 @@ public class ProductsAppStack extends Stack {
                 .functionName(lambdaName)
                 .handler("products.ProductsAdminLambda")
                 .memorySize(512)
-                .timeout(Duration.seconds(3))
-                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.1-SNAPSHOT.jar"))
+                .timeout(Duration.seconds(5))
+                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.5-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .environment(envVariables)
                 .build();

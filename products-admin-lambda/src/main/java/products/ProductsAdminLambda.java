@@ -17,6 +17,8 @@ public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyReques
     private static final Logger LOGGER = LogManager.getLogger(ProductsAdminLambda.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    private final ProductRepository repository = new ProductRepository();
+
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
 
@@ -33,7 +35,10 @@ public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyReques
             }
         }
         // chamada em /products
-        return buildResponse("Post products Ok");
+        var product = GSON.fromJson(input.getBody(), Product.class);
+        product = repository.save(product);
+        return APIGatewayResponse.created201(product);
+
     }
 
     private APIGatewayProxyResponseEvent buildResponse(String message) {

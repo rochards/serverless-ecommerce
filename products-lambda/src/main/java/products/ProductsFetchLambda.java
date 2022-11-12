@@ -17,14 +17,20 @@ public class ProductsFetchLambda implements RequestHandler<APIGatewayProxyReques
     private static final Logger LOGGER = LogManager.getLogger(ProductsFetchLambda.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    private final ProductRepository repository = new ProductRepository();
+
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
 
         LOGGER.log(Level.INFO, "API Gateway RequestId: {}", input.getRequestContext().getRequestId());
 
         if (input.getResource().equals("/products/{id}")) {
-            LOGGER.log(Level.INFO, "GET /products/{}", input.getPathParameters().get("id"));
-            return buildResponse("Get /products/{id} Ok");
+            String id = input.getPathParameters().get("id");
+            LOGGER.log(Level.INFO, "GET /products/{}", id);
+
+            return repository.findById(id)
+                    .map(APIGatewayResponse::response200)
+                    .orElseGet(() -> APIGatewayResponse.notFound404("Not found product with id: " + id));
         }
 
         return buildResponse("Get products Ok");
