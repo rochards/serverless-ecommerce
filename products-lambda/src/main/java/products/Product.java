@@ -25,6 +25,9 @@ public class Product {
     @DynamoDBAttribute(attributeName = "Price")
     private BigDecimal price;
 
+    @DynamoDBAttribute(attributeName = "URLImage")
+    private String urlImage;
+
     public String getId() {
         return id;
     }
@@ -63,5 +66,13 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getUrlImage() {
+        return urlImage;
+    }
+
+    public void setUrlImage(String urlImage) {
+        this.urlImage = urlImage;
     }
 }

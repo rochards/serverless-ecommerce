@@ -41,7 +41,7 @@ No DynamoDB precisamos apenas de definir a chave primária da tabela, no entanto
 | -------- | ---------------- |
 | `Id` (chave primária) | String |
 | `Model` | String |
-| `ProductUrl` | String |
+| `URLImage` | String |
 | `Code` | String |
 | `Price` | Number |
 | `ProductName` | String |
