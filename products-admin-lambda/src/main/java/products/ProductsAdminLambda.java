@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
-
 public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductsAdminLambda.class);
@@ -29,8 +27,7 @@ public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyReques
             if (input.getHttpMethod().equals("PUT")) {
                 return handleUpdateProduct(input, productId);
             } else if (input.getHttpMethod().equals("DELETE")) {
-                LOGGER.log(Level.INFO, "DELETE /products/{}", productId);
-                return buildResponse("Delete products ok");
+                return handleDeleteProduct(productId);
             }
         }
         // chamada em POST /products
@@ -58,15 +55,12 @@ public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyReques
                 .orElseGet(() -> APIGatewayResponse.notFound404(String.format("Not found product with id %s to be updated", productId)));
     }
 
-    private APIGatewayProxyResponseEvent buildResponse(String message) {
-        var response = new APIGatewayProxyResponseEvent();
-        response.setStatusCode(200);
-        response.setIsBase64Encoded(false);
-        response.setHeaders(
-                Map.of("Content-Type", "application/json")
-        );
-        response.setBody(GSON.toJson(Map.of("message", message)));
+    private APIGatewayProxyResponseEvent handleDeleteProduct(String productId) {
+        LOGGER.log(Level.INFO, "DELETE - Deleting product associated with id: {}", productId);
 
-        return response;
+        var optionalProduct = repository.delete(productId);
+
+        return optionalProduct.map(APIGatewayResponse::ok200)
+                .orElseGet(() -> APIGatewayResponse.notFound404(String.format("Not found product with id %s to be deleted", productId)));
     }
 }

@@ -77,7 +77,7 @@ public class ProductsAppStack extends Stack {
                 .handler("products.ProductsAdminLambda")
                 .memorySize(512)
                 .timeout(Duration.seconds(5))
-                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.7-SNAPSHOT.jar"))
+                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.8-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .environment(envVariables)
                 .build();
