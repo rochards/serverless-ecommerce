@@ -3,6 +3,7 @@ package products;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import org.apache.logging.log4j.LogManager;
@@ -41,10 +42,10 @@ public class ProductRepository {
         return optionalProduct;
     }
 
-    private Optional<Product> update(String id, Product updatedProduct) {
+    public Optional<Product> update(String id, Product updatedProduct) {
         var saveExpression = new DynamoDBSaveExpression();
         saveExpression.setExpected(
-                Map.of(Product.HASH_KEY_ATTRIBUTE_NAME, new ExpectedAttributeValue(true))
+                Map.of(Product.HASH_KEY_ATTRIBUTE_NAME, new ExpectedAttributeValue(new AttributeValue(id)).withExists(true))
         );
 
         try {
@@ -56,8 +57,6 @@ public class ProductRepository {
             LOGGER.error("Failed to update product: " + updatedProduct, e);
             return Optional.empty();
         }
-
-
     }
 
     private Optional<Product> findById(String id) {

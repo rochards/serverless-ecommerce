@@ -42,7 +42,6 @@ public class EcommerceApiGtwStack extends Stack {
             endpoint /products
         */
         Resource products = restApi.getRoot().addResource("products");
-        products.addMethod(HttpMethod.GET.name(), productsFetchIntegration);
         products.addMethod(HttpMethod.POST.name(), productsAdminIntegration);
 
         /*

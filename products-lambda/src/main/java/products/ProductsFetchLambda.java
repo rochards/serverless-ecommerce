@@ -22,29 +22,12 @@ public class ProductsFetchLambda implements RequestHandler<APIGatewayProxyReques
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
 
-        LOGGER.log(Level.INFO, "API Gateway RequestId: {}", input.getRequestContext().getRequestId());
+        LOGGER.log(Level.INFO, "API Gateway RequestEvent: {}", input);
 
-        if (input.getResource().equals("/products/{id}")) {
-            String id = input.getPathParameters().get("id");
-            LOGGER.log(Level.INFO, "GET /products/{}", id);
+        String id = input.getPathParameters().get("id");
 
-            return repository.findById(id)
-                    .map(APIGatewayResponse::response200)
-                    .orElseGet(() -> APIGatewayResponse.notFound404("Not found product with id: " + id));
-        }
-
-        return buildResponse("Get products Ok");
-    }
-
-    private APIGatewayProxyResponseEvent buildResponse(String message) {
-        var response = new APIGatewayProxyResponseEvent();
-        response.setStatusCode(200);
-        response.setIsBase64Encoded(false);
-        response.setHeaders(
-                Map.of("Content-Type", "application/json")
-        );
-        response.setBody(GSON.toJson(Map.of("message", message)));
-
-        return response;
+        return repository.findById(id)
+                .map(APIGatewayResponse::response200)
+                .orElseGet(() -> APIGatewayResponse.notFound404("Not found product with id: " + id));
     }
 }

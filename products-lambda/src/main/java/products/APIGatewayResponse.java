@@ -9,12 +9,13 @@ import java.util.Map;
 public class APIGatewayResponse {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Map<String, String> HEADERS = Map.of("Content-Type", "application/json");
 
     public static APIGatewayProxyResponseEvent response200(Product product) {
         var response = new APIGatewayProxyResponseEvent();
         response.setStatusCode(200);
         response.setIsBase64Encoded(false);
-        response.setHeaders(Map.of("Content-Type", "application/json"));
+        response.setHeaders(HEADERS);
         response.setBody(GSON.toJson(product));
 
         return response;
@@ -24,7 +25,7 @@ public class APIGatewayResponse {
         var response = new APIGatewayProxyResponseEvent();
         response.setStatusCode(404);
         response.setIsBase64Encoded(false);
-        response.setHeaders(Map.of("Content-Type", "application/json"));
+        response.setHeaders(HEADERS);
         response.setBody(GSON.toJson(Map.of("message", message)));
 
         return response;

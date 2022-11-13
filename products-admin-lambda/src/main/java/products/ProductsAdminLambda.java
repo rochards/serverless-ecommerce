@@ -22,23 +22,40 @@ public class ProductsAdminLambda implements RequestHandler<APIGatewayProxyReques
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
 
-        LOGGER.log(Level.INFO, "API Gateway RequestId: {}", input.getRequestContext().getRequestId());
+        LOGGER.log(Level.INFO, "API Gateway RequestEvent: {}", input);
 
         if (input.getResource().equals("/products/{id}")) {
             var productId = input.getPathParameters().get("id");
             if (input.getHttpMethod().equals("PUT")) {
-                LOGGER.log(Level.INFO, "PUT /products/{}", productId);
-                return buildResponse("Put products ok");
+                return handleUpdateProduct(input, productId);
             } else if (input.getHttpMethod().equals("DELETE")) {
                 LOGGER.log(Level.INFO, "DELETE /products/{}", productId);
                 return buildResponse("Delete products ok");
             }
         }
-        // chamada em /products
-        var product = GSON.fromJson(input.getBody(), Product.class);
-        product = repository.save(product);
-        return APIGatewayResponse.created201(product);
+        // chamada em POST /products
+        return handleSaveProduct(input);
+    }
 
+    private APIGatewayProxyResponseEvent handleSaveProduct(APIGatewayProxyRequestEvent input) {
+        var inputBody = input.getBody();
+        LOGGER.log(Level.INFO, "POST - Saving received product: {}", inputBody);
+
+        var product = GSON.fromJson(inputBody, Product.class);
+        product = repository.save(product);
+
+        return APIGatewayResponse.created201(product);
+    }
+
+    private APIGatewayProxyResponseEvent handleUpdateProduct(APIGatewayProxyRequestEvent input, String productId) {
+        String inputBody = input.getBody();
+        LOGGER.log(Level.INFO, "PUT - Updating received product: {}. Received product id: {}", inputBody, productId);
+
+        var updatedProduct = GSON.fromJson(inputBody, Product.class);
+        var optionalProduct = repository.update(productId, updatedProduct);
+
+        return optionalProduct.map(APIGatewayResponse::ok200)
+                .orElseGet(() -> APIGatewayResponse.notFound404(String.format("Not found product with id %s to be updated", productId)));
     }
 
     private APIGatewayProxyResponseEvent buildResponse(String message) {
