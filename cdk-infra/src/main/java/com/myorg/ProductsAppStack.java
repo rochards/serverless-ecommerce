@@ -9,6 +9,7 @@ import software.amazon.awscdk.services.dynamodb.BillingMode;
 import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
+import software.amazon.awscdk.services.lambda.LambdaInsightsVersion;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
@@ -68,6 +69,7 @@ public class ProductsAppStack extends Stack {
                 .environment(envVariables)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE) // ativando o X-Ray
+//                .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para reduzir gastos na conta
                 .build();
     }
 
@@ -86,6 +88,7 @@ public class ProductsAppStack extends Stack {
                 .environment(envVariables)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE)
+//                .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para reduzir gastos na conta
                 .build();
     }
 
