@@ -66,6 +66,7 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 - [Creating a serverless application using the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/serverless_example.html)
 - [AWS Lambda Developer Guide](https://github.com/awsdocs/aws-lambda-developer-guide)
 - [Java sample applications for AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/java-samples.html)
+- [Java examples](https://github.com/aws-samples/aws-cdk-examples/tree/master/java)
 - [Using AWS Lambda with Amazon API Gateway](https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html)
 - [AWS Lambda function handler in Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
 - [Deploy Java Lambda functions with .zip or JAR file archives](https://docs.aws.amazon.com/lambda/latest/dg/java-package.html)
