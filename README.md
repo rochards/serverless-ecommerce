@@ -61,6 +61,9 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 :warning: Essa abordagem só é possível enquanto os arquivos forem menor que 50 MB, como descrito em [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).
 
 
+### Observações
+- Para habilitar o X-Ray bastou apenas eu adicionar as dependências no `pom.xml`, não precisei adicionar nenhum novo código nas aplicações das Lambdas. Já no cdk eu precisei habilitar o tracing.
+
 
 ### Referências
 - [Creating a serverless application using the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/serverless_example.html)
@@ -70,3 +73,5 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 - [Using AWS Lambda with Amazon API Gateway](https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html)
 - [AWS Lambda function handler in Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
 - [Deploy Java Lambda functions with .zip or JAR file archives](https://docs.aws.amazon.com/lambda/latest/dg/java-package.html)
+- [Instrumenting Java code in AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/java-tracing.html)
+- [AWS X-Ray SDK for Java](https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java.html)

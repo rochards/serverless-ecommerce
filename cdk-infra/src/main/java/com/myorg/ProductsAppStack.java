@@ -10,6 +10,8 @@ import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.lambda.Tracing;
+import software.amazon.awscdk.services.logs.RetentionDays;
 import software.constructs.Construct;
 
 import java.util.HashMap;
@@ -61,9 +63,11 @@ public class ProductsAppStack extends Stack {
                                                             o pacote.nome_da_classe pq esta implementa a interface RequestHandler */
                 .memorySize(512)
                 .timeout(Duration.seconds(5))
-                .code(Code.fromAsset("lambdas/products/products-lambda-1.3-SNAPSHOT.jar"))
+                .code(Code.fromAsset("lambdas/products/products-lambda-1.4-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .environment(envVariables)
+                .logRetention(RetentionDays.ONE_DAY)
+                .tracing(Tracing.ACTIVE) // ativando o X-Ray
                 .build();
     }
 
@@ -77,9 +81,11 @@ public class ProductsAppStack extends Stack {
                 .handler("products.ProductsAdminLambda")
                 .memorySize(512)
                 .timeout(Duration.seconds(5))
-                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.9-SNAPSHOT.jar"))
+                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
                 .environment(envVariables)
+                .logRetention(RetentionDays.ONE_DAY)
+                .tracing(Tracing.ACTIVE)
                 .build();
     }
 
