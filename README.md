@@ -61,6 +61,7 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 | `EventType`                         | String           |
 | `Ttl`                               | Number           |
 | `Info`: {`ProductId`, `Price`}      | Map              |
+
 em especial, `ProductId` é do tipo String e `Price` do tipo Number.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
