@@ -33,19 +33,35 @@ A última coluna destaca a função lambda responsável pela operação
 | Alterar um produto pelo id | `/products/{id_produto}` | PUT | products-admin-lambda |
 | Apagar um produto pelo id | `/products/{id_produto}` | DELETE | products-admin-lambda |
 
-### Modelagem da tabela de produtos no DynamoDB
+### Modelagem das tabelas no DynamoDB
 
-No DynamoDB precisamos apenas de definir a chave primária da tabela, no entanto para facilitar a codificação da aplicação, vamos modelar uma tabela de produtos com os seguintes atributos:
+#### Tabela de produtos
+No DynamoDB precisamos apenas de definir a chave primária da tabela, no entanto para facilitar a codificação da aplicação, vamos modelar uma tabela de produtos (`ProductsTable`) com os seguintes atributos:
 
 | Atributo | Tipo no DynamoDB |
 | -------- | ---------------- |
-| `Id` (chave primária) | String |
+| `Id` (chave primária e hash key) | String |
 | `Model` | String |
 | `URLImage` | String |
 | `Code` | String |
 | `Price` | Number |
 | `ProductName` | String |
 
+
+#### Tabela de eventos
+O objetivo desta tabela é manter um registro de alterações realizadas na `ProductsTable`. Tal tabela é chamada `EventsTable` e possui os seguintes atributos:
+
+| Atributo                            | Tipo no DynamoDB |
+| ----------------------------------- | ---------------- |
+| `Code` (hash key)                   | String           |
+| `EventTypeAndTimestamp` (range key) | String           |
+| `Email` (de quem fez a alteração)   | String           |
+| `CreatedAt`                         | Number           |
+| `RequestId`                         | String           |
+| `EventType`                         | String           |
+| `Ttl`                               | Number           |
+| `Info`: {`ProductId`, `Price`}      | Map              |
+em especial, `ProductId` é do tipo String e `Price` do tipo Number.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
