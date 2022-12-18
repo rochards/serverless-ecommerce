@@ -16,22 +16,28 @@ import software.constructs.Construct;
 
 public class ProductsAppStack extends Stack {
 
-    private final Table productsDdbTable;
     private final Function productsFetchHandler;
     private final Function productsAdminHandler;
 
-    public ProductsAppStack(Construct scope, String stackId) {
+    public ProductsAppStack(Construct scope, String stackId, Table eventsTable) {
         super(scope, stackId, null);
 
-        this.productsDdbTable = createDynamoDBTable();
-        this.productsFetchHandler = createLambda("ProductsFetchLambda", "products.ProductsFetchLambda",
-                "lambdas/products/products-lambda-1.4-SNAPSHOT.jar");
+        Function productEventsHandler = createLambda("ProductEventsLambda", "products.ProductEventsLambda",
+                "lambdas/products/product-events-1.0-SNAPSHOT.jar");
+        eventsTable.grantWriteData(productEventsHandler);
+
         this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
                 "lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar");
+        this.productsAdminHandler.addEnvironment("PRODUCTS_EVENTS_FUNCTION_NAME", productEventsHandler.getFunctionName());
+        productEventsHandler.grantInvoke(this.productsAdminHandler); // atribuindo permissao para a admin invocar a events
 
+        this.productsFetchHandler = createLambda("ProductsFetchLambda", "products.ProductsFetchLambda",
+                "lambdas/products/products-lambda-1.4-SNAPSHOT.jar");
+
+        Table productsDdbTable = createDynamoDBTable();
         // atribuindo as lambdas permissões de leitura e escrita na tabela
-        this.productsDdbTable.grantReadData(this.productsFetchHandler);
-        this.productsDdbTable.grantReadWriteData(this.productsAdminHandler);
+        productsDdbTable.grantReadWriteData(this.productsAdminHandler);
+        productsDdbTable.grantReadData(this.productsFetchHandler);
     }
 
     private Table createDynamoDBTable() {

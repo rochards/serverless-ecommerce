@@ -1,6 +1,5 @@
 package com.myorg;
 
-import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.dynamodb.Attribute;
@@ -13,8 +12,8 @@ public class EventsDynamoDBStack extends Stack {
 
     private final Table eventsTable;
 
-    public EventsDynamoDBStack(Construct scope, String id) {
-        super(scope, id, null);
+    public EventsDynamoDBStack(Construct scope, String stackId) {
+        super(scope, stackId, null);
         this.eventsTable = createTable();
     }
 
@@ -40,5 +39,9 @@ public class EventsDynamoDBStack extends Stack {
                 )
                 .timeToLiveAttribute("Ttl")
                 .build();
+    }
+
+    public Table getEventsTable() {
+        return eventsTable;
     }
 }
