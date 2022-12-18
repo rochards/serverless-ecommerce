@@ -24,8 +24,10 @@ public class ProductsAppStack extends Stack {
         super(scope, stackId, null);
 
         this.productsDdbTable = createDynamoDBTable();
-        this.productsFetchHandler = createProductsFetchLambda();
-        this.productsAdminHandler = createProductsAdminLambda();
+        this.productsFetchHandler = createLambda("ProductsFetchLambda", "products.ProductsFetchLambda",
+                "lambdas/products/products-lambda-1.4-SNAPSHOT.jar");
+        this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
+                "lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar");
 
         // atribuindo as lambdas permissões de leitura e escrita na tabela
         this.productsDdbTable.grantReadData(this.productsFetchHandler);
@@ -49,32 +51,13 @@ public class ProductsAppStack extends Stack {
                 .build();
     }
 
-    private Function createProductsFetchLambda() {
-        String lambdaName = "ProductsFetchLambda";
-
+    private Function createLambda(String lambdaName, String handlerName, String pathToJar) {
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
-                .handler("products.ProductsFetchLambda") /* igual ao do projeto products-lambda. É permitido referenciar
-                                                            o pacote.nome_da_classe pq esta implementa a interface RequestHandler */
+                .handler(handlerName)  // É permitido referenciar o pacote.nome_da_classe se implementar a interface RequestHandler
                 .memorySize(512)
                 .timeout(Duration.seconds(5))
-                .code(Code.fromAsset("lambdas/products/products-lambda-1.4-SNAPSHOT.jar"))
-                .runtime(Runtime.JAVA_11)
-                .logRetention(RetentionDays.ONE_DAY)
-                .tracing(Tracing.ACTIVE) // ativando o X-Ray
-//                .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para reduzir gastos na conta
-                .build();
-    }
-
-    private Function createProductsAdminLambda() {
-        String lambdaName = "ProductsAdminLambda";
-
-        return Function.Builder.create(this, lambdaName)
-                .functionName(lambdaName)
-                .handler("products.ProductsAdminLambda")
-                .memorySize(512)
-                .timeout(Duration.seconds(5))
-                .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar"))
+                .code(Code.fromAsset(pathToJar))
                 .runtime(Runtime.JAVA_11)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE)
