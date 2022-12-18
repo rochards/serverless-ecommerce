@@ -9,14 +9,10 @@ import software.amazon.awscdk.services.dynamodb.BillingMode;
 import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.LambdaInsightsVersion;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.constructs.Construct;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ProductsAppStack extends Stack {
 
@@ -55,8 +51,6 @@ public class ProductsAppStack extends Stack {
 
     private Function createProductsFetchLambda() {
         String lambdaName = "ProductsFetchLambda";
-        Map<String, String> envVariables = new HashMap<>();
-        envVariables.put("PRODUCTS_DDB_TABLE", this.productsDdbTable.getTableName());
 
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
@@ -66,7 +60,6 @@ public class ProductsAppStack extends Stack {
                 .timeout(Duration.seconds(5))
                 .code(Code.fromAsset("lambdas/products/products-lambda-1.4-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
-                .environment(envVariables)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE) // ativando o X-Ray
 //                .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para reduzir gastos na conta
@@ -75,8 +68,6 @@ public class ProductsAppStack extends Stack {
 
     private Function createProductsAdminLambda() {
         String lambdaName = "ProductsAdminLambda";
-        Map<String, String> envVariables = new HashMap<>();
-        envVariables.put("PRODUCTS_DDB_TABLE", this.productsDdbTable.getTableName());
 
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
@@ -85,7 +76,6 @@ public class ProductsAppStack extends Stack {
                 .timeout(Duration.seconds(5))
                 .code(Code.fromAsset("lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar"))
                 .runtime(Runtime.JAVA_11)
-                .environment(envVariables)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE)
 //                .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para reduzir gastos na conta
