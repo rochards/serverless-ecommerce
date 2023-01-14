@@ -53,16 +53,16 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 
 | Atributo                            | Tipo no DynamoDB |
 | ----------------------------------- | ---------------- |
-| `Code` (hash key)                   | String           |
+| `ProductCode` (hash key)                   | String           |
 | `EventTypeAndTimestamp` (range key) | String           |
 | `Email` (de quem fez a alteração)   | String           |
 | `CreatedAt`                         | Number           |
 | `RequestId`                         | String           |
 | `EventType`                         | String           |
 | `Ttl`                               | Number           |
-| `Info`: {`ProductId`, `Price`}      | Map              |
+| `Info`: {`ProductId`, `ProductPrice`}      | Map              |
 
-em especial, `ProductId` é do tipo String e `Price` do tipo Number.
+em especial, `ProductId` é do tipo String e `ProductPrice` do tipo Number.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
