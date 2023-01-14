@@ -53,7 +53,7 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 
 | Atributo                            | Tipo no DynamoDB |
 | ----------------------------------- | ---------------- |
-| `ProductCode` (hash key)                   | String           |
+| `Code` (hash key)                   | String           |
 | `EventTypeAndTimestamp` (range key) | String           |
 | `Email` (de quem fez a alteração)   | String           |
 | `CreatedAt`                         | Number           |
