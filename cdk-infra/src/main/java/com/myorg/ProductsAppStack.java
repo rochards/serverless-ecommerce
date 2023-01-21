@@ -22,8 +22,8 @@ public class ProductsAppStack extends Stack {
     public ProductsAppStack(Construct scope, String stackId, Table eventsTable) {
         super(scope, stackId, null);
 
-        Function productEventsHandler = createLambda("ProductEventsLambda", "products.ProductEventsLambda",
-                "lambdas/products/product-events-1.0-SNAPSHOT.jar");
+        Function productEventsHandler = createLambda("ProductsEventsLambda", "products.ProductsEventsLambda",
+                "lambdas/products/products-events-lambda-1.0-SNAPSHOT.jar");
         eventsTable.grantWriteData(productEventsHandler);
 
         this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
