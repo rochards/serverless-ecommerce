@@ -2,11 +2,15 @@ package integration;
 
 import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
+import com.amazonaws.services.lambda.model.InvocationType;
 import com.amazonaws.services.lambda.model.InvokeRequest;
+import com.amazonaws.services.lambda.model.InvokeResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.Future;
 
 public class LambdaEventsAsyncClient {
 
@@ -23,17 +27,19 @@ public class LambdaEventsAsyncClient {
 
 
     public LambdaEventsAsyncClient() {
-        this.client = AWSLambdaAsyncClientBuilder.standard().build();
-        this.request = new InvokeRequest();
-        request.withFunctionName(productsEventsFunctionName);
+        this.client = AWSLambdaAsyncClientBuilder.defaultClient();
+        this.request = new InvokeRequest()
+                .withFunctionName(productsEventsFunctionName)
+                .withInvocationType(InvocationType.Event);
     }
 
     public void sendEvent(ProductEvent event) {
         var eventJson = GSON.toJson(event);
         request.withPayload(eventJson);
 
-        LOGGER.info("Sending async request payload: {}\nto: {}", eventJson, productsEventsFunctionName);
-        client.invokeAsync(request);
-        LOGGER.info("Async request sent");
+        LOGGER.info("Sending async request payload: {}\nto: {}", request.getPayload().toString(), productsEventsFunctionName);
+        Future<InvokeResult> invokeResultFuture = client.invokeAsync(request);
+
+        LOGGER.info("Async request sent. Is done? {}", invokeResultFuture.isDone());
     }
 }

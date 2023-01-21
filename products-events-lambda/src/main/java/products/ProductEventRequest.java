@@ -1,13 +1,15 @@
-package integration;
+package products;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 
-@Builder
+@Getter
+@Setter
 @ToString
-public class ProductEvent {
+public class ProductEventRequest {
 
     private String requestId;
     private EventType eventType;
@@ -15,8 +17,4 @@ public class ProductEvent {
     private String productCode;
     private BigDecimal productPrice;
     private String email;
-
-    public enum EventType {
-        CREATED, UPDATED, DELETED
-    }
 }

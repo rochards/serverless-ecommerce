@@ -27,12 +27,12 @@ public class ProductsAppStack extends Stack {
         eventsTable.grantWriteData(productEventsHandler);
 
         this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
-                "lambdas/products/products-admin-lambda-1.10-SNAPSHOT.jar");
+                "lambdas/products/products-admin-lambda-1.14-SNAPSHOT.jar");
         this.productsAdminHandler.addEnvironment("PRODUCTS_EVENTS_FUNCTION_NAME", productEventsHandler.getFunctionName());
         productEventsHandler.grantInvoke(this.productsAdminHandler); // atribuindo permissao para a admin invocar a events
 
         this.productsFetchHandler = createLambda("ProductsFetchLambda", "products.ProductsFetchLambda",
-                "lambdas/products/products-lambda-1.4-SNAPSHOT.jar");
+                "lambdas/products/products-lambda-1.5-SNAPSHOT.jar");
 
         Table productsDdbTable = createDynamoDBTable();
         // atribuindo as lambdas permissões de leitura e escrita na tabela
