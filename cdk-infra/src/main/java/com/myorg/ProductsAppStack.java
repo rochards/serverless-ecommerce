@@ -27,7 +27,7 @@ public class ProductsAppStack extends Stack {
         eventsTable.grantWriteData(productEventsHandler);
 
         this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
-                "lambdas/products/products-admin-lambda-1.14-SNAPSHOT.jar");
+                "lambdas/products/products-admin-lambda-1.16-SNAPSHOT.jar");
         this.productsAdminHandler.addEnvironment("PRODUCTS_EVENTS_FUNCTION_NAME", productEventsHandler.getFunctionName());
         productEventsHandler.grantInvoke(this.productsAdminHandler); // atribuindo permissao para a admin invocar a events
 
