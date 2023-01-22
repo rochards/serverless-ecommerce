@@ -33,7 +33,7 @@ public class LambdaEventsAsyncClient {
         var eventJson = GSON.toJson(event);
         request.withPayload(eventJson);
 
-        LOGGER.info("Sending async request payload: {}\nto: {}", request.getPayload().toString(), productsEventsFunctionName);
+        LOGGER.info("Sending async request payload: {}\nto: {}", eventJson, productsEventsFunctionName);
 
         client.invoke(request);
 

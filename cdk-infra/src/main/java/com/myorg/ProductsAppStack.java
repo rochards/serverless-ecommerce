@@ -23,11 +23,11 @@ public class ProductsAppStack extends Stack {
         super(scope, stackId, null);
 
         Function productEventsHandler = createLambda("ProductsEventsLambda", "products.ProductsEventsLambda",
-                "lambdas/products/products-events-lambda-1.0-SNAPSHOT.jar");
+                "lambdas/products/products-events-lambda-1.2-SNAPSHOT.jar");
         eventsTable.grantWriteData(productEventsHandler);
 
         this.productsAdminHandler = createLambda("ProductsAdminLambda", "products.ProductsAdminLambda",
-                "lambdas/products/products-admin-lambda-1.16-SNAPSHOT.jar");
+                "lambdas/products/products-admin-lambda-1.17-SNAPSHOT.jar");
         this.productsAdminHandler.addEnvironment("PRODUCTS_EVENTS_FUNCTION_NAME", productEventsHandler.getFunctionName());
         productEventsHandler.grantInvoke(this.productsAdminHandler); // atribuindo permissao para a admin invocar a events
 

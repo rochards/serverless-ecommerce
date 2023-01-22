@@ -14,4 +14,14 @@ public class ProductEventRepository {
     public ProductEventRepository() {
         this.mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.standard().build());
     }
+
+    public ProductEventModel save(ProductEventModel productEventModel) {
+        LOGGER.info("Saving ProductEventModel in DynamoDB: {}", productEventModel);
+
+        mapper.save(productEventModel);
+
+        LOGGER.info("ProductEventModel saved with success");
+        return productEventModel;
+    }
+
 }

@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>products-admin-lambda</artifactId>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.17-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
