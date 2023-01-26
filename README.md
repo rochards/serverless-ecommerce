@@ -24,7 +24,8 @@ Os comandos devem ser executados dentro do diretório `cdk-infra`, pois é onde 
 
 ### Operações expostas pelo API Gateway ECommerceAPI
 
-A última coluna destaca a função lambda responsável pela operação
+#### Gerenciamento de produtos
+A última coluna destaca a função lambda responsável pela operação:
 
 | Operação | Endpoint | Verbo HTTP | Lambda |
 | -------- | -------- | ---------- | ------ |
@@ -32,6 +33,30 @@ A última coluna destaca a função lambda responsável pela operação
 | Buscar um produto pelo id | `/products/{id_produto}` | GET | products-lambda |
 | Alterar um produto pelo id | `/products/{id_produto}` | PUT | products-admin-lambda |
 | Apagar um produto pelo id | `/products/{id_produto}` | DELETE | products-admin-lambda |
+
+#### Gerenciamento de pedidos
+
+Todas as operações são realizadas pela Lambda `orders`:
+
+| Operação | Endpoint | Verbo HTTP |
+| -------- | -------- | ---------- |
+| Criar um pedido | `/orders` | POST |
+| Listar todos os pedidos de um usuário | `/orders?email={email}` | GET |
+| Buscar um pedido de um usuário | `/orders?email={email}&orderId={order_Id}` | GET |
+| Apagar um pedido de um usuário | `/orders?email={email}&orderId={order_Id}` | DELETE |
+
+Abaixo segue um exemplo de payload na criação de um pedido:
+```JSON
+{
+    "email": "example@mail.com.br",
+    "productIds": ["a969051e-9181-4c60-b428-8459bfdfd0d7", "29014f3c-4e4b-462f-845f-fe723d29d4d7"],
+    "paymentMethod": "CASH",
+    "shipping": {
+        "type": "URGENT",
+        "carrier": "FEDEX"
+    }
+}
+```
 
 ### Modelagem das tabelas no DynamoDB
 
@@ -54,7 +79,7 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 | Atributo                            | Tipo no DynamoDB |
 | ----------------------------------- | ---------------- |
 | `Code` (hash key)                   | String           |
-| `EventTypeAndTimestamp` (range key) | String           |
+| `EventTypeAndTimestamp` (sort key)  | String           |
 | `Email` (de quem fez a alteração)   | String           |
 | `CreatedAt`                         | Number           |
 | `RequestId`                         | String           |
@@ -63,6 +88,21 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 | `Info`: {`ProductId`, `ProductPrice`}      | Map              |
 
 em especial, `ProductId` é do tipo String e `ProductPrice` do tipo Number.
+
+
+#### Tabela de pedidos
+Essa tabela registra os pedidos na `OrdersTable` e possui a seguinte estrutura:
+
+| Atributo                        | Tipo no DynamoDB |
+| ------------------------------- | -----------------|
+| `Email` (hash key)              | String           |
+| `OrderId` (sort key)            | String           |
+| `Shipping`: {`Type`, `Carrier`} | Map              |
+| `CreatedAt`                     | Number           |
+| `Products`: [{`Price`, `Code`}]| | List            |
+| `Billing`: {`TotalPrice`, `PaymentMethod`} | Map   |
+
+em especial, `Price` e `TitalPrice` são ambos do tipo Number. Já `Type`, `Carrier`, `Code` e `PaymentMethod` são String.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
