@@ -18,6 +18,7 @@ public class ProductsAppStack extends Stack {
 
     private final Function productsFetchHandler;
     private final Function productsAdminHandler;
+    private final Table productsDdbTable;
 
     public ProductsAppStack(Construct scope, String stackId, Table eventsTable) {
         super(scope, stackId, null);
@@ -34,7 +35,7 @@ public class ProductsAppStack extends Stack {
         this.productsFetchHandler = createLambda("ProductsFetchLambda", "products.ProductsFetchLambda",
                 "lambdas/products/products-lambda-1.5-SNAPSHOT.jar");
 
-        Table productsDdbTable = createDynamoDBTable();
+        this.productsDdbTable = createDynamoDBTable();
         // atribuindo as lambdas permissões de leitura e escrita na tabela
         productsDdbTable.grantReadWriteData(this.productsAdminHandler);
         productsDdbTable.grantReadData(this.productsFetchHandler);
@@ -77,5 +78,9 @@ public class ProductsAppStack extends Stack {
 
     public Function getProductsAdminHandler() {
         return productsAdminHandler;
+    }
+
+    public Table getProductsDdbTable() {
+        return productsDdbTable;
     }
 }

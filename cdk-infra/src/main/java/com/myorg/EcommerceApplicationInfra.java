@@ -7,13 +7,18 @@ public class EcommerceApplicationInfra {
         App app = new App();
 
         EventsDynamoDBStack eventsDynamoDBStack = new EventsDynamoDBStack(app, "EventsDynamoDBStack");
+        
         ProductsAppStack productsAppStack = new ProductsAppStack(app, "ProductsAppStack", eventsDynamoDBStack.getEventsTable());
         productsAppStack.addDependency(eventsDynamoDBStack);
+        
+        OrdersAppStack ordersAppStack = new OrdersAppStack(app, "OrdersAppStack", productsAppStack.getProductsDdbTable());
+        ordersAppStack.addDependency(productsAppStack);
 
         EcommerceApiGtwStack ecommerceApiGtwStack =
                 new EcommerceApiGtwStack(app, "EcommerceApiGtwStack", productsAppStack.getProductsFetchHandler(),
-                        productsAppStack.getProductsAdminHandler());
+                        productsAppStack.getProductsAdminHandler(), ordersAppStack.getOrdersHandler());
         ecommerceApiGtwStack.addDependency(productsAppStack);
+        ecommerceApiGtwStack.addDependency(ordersAppStack);
 
         app.synth();
     }

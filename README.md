@@ -129,6 +129,7 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 - [Java sample applications for AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/java-samples.html)
 - [Java examples](https://github.com/aws-samples/aws-cdk-examples/tree/master/java)
 - [Using AWS Lambda with Amazon API Gateway](https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html)
+- [Amazon API Gateway Construct Library](https://docs.aws.amazon.com/cdk/api/v2/java/index.html)
 - [AWS Lambda function handler in Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
 - [Deploy Java Lambda functions with .zip or JAR file archives](https://docs.aws.amazon.com/lambda/latest/dg/java-package.html)
 - [Instrumenting Java code in AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/java-tracing.html)

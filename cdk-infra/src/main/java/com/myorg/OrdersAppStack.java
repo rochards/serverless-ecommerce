@@ -16,21 +16,21 @@ import software.constructs.Construct;
 
 public class OrdersAppStack extends Stack {
 
-    private final Function ordersFetchHandler;
+    private final Function ordersHandler;
 
     public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable) {
         super(productsDdbTable, stackId, null);
 
         Table ordersDdbTable = createOrdersDdbTable();
 
-        ordersFetchHandler = createLambda("OrdersLambda", "orders.OrdersLambda",
+        ordersHandler = createLambda("OrdersLambda", "orders.OrdersLambda",
                 "lambdas/orders/orders-lambda-1.0-SNAPSHOT.jar");
-        ordersFetchHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
-        ordersFetchHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
+        ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
+        ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
 
         // atribuindo permissoes para a lambda nas tabelas
-        productsDdbTable.grantReadData(ordersFetchHandler);
-        ordersDdbTable.grantReadWriteData(ordersFetchHandler);
+        productsDdbTable.grantReadData(ordersHandler);
+        ordersDdbTable.grantReadWriteData(ordersHandler);
     }
 
     private Table createOrdersDdbTable() {
@@ -70,7 +70,7 @@ public class OrdersAppStack extends Stack {
                 .build();
     }
 
-    public Function getOrdersFetchHandler() {
-        return ordersFetchHandler;
+    public Function getOrdersHandler() {
+        return ordersHandler;
     }
 }
