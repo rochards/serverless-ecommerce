@@ -99,10 +99,10 @@ Essa tabela registra os pedidos na `OrdersTable` e possui a seguinte estrutura:
 | `OrderId` (sort key)            | String           |
 | `Shipping`: {`Type`, `Carrier`} | Map              |
 | `CreatedAt`                     | Number           |
-| `Products`: [{`Price`, `Code`}]| | List            |
+| `Products`: [{`Id`,`Price`, `Code`}] | List             |
 | `Billing`: {`TotalPrice`, `PaymentMethod`} | Map   |
 
-em especial, `Price` e `TitalPrice` são ambos do tipo Number. Já `Type`, `Carrier`, `Code` e `PaymentMethod` são String.
+em especial, `Price` e `TotalPrice` são ambos do tipo Number. Já, `Id`, `Type`, `Carrier`, `Code` e `PaymentMethod` são String.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
