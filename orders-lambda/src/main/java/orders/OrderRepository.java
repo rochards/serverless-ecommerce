@@ -61,7 +61,7 @@ public class OrderRepository {
         optionalOrder.ifPresent(orderModel -> {
             LOGGER.info("Deleting order = {}", orderModel.toString());
             mapper.delete(orderModel);
-            LOGGER.info("Order deleted");
+            LOGGER.info("Order deleted. orderId = {}", orderId);
         });
 
         return optionalOrder;
