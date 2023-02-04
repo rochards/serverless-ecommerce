@@ -74,13 +74,21 @@ public class EcommerceApiGtwStack extends Stack {
 
         /* endpoint /orders */
         Resource orders = restApi.getRoot().addResource("orders");
-        orders.addMethod(HttpMethod.GET.name(), ordersIntegration); // o GET ja basta para tratar os queries parameters.
-                                                                    // Ex.: /orders?email={email}
         orders.addMethod(HttpMethod.POST.name(), ordersIntegration);
         /*
-         * para o DELETE, vou indicar que os parametros email e orderId sao obrigatorios.
+         * para o DELETE e GET, vou indicar os parametros obrigatorios obrigatorios.
          * OBS.: o formato abaixo method.request.querystring.SEU_PARAMETRO é definido na doc do API gateway.
          */
+        orders.addMethod(HttpMethod.GET.name(), ordersIntegration,
+                MethodOptions.builder()
+                        .requestParameters(Map.of(
+                                "method.request.querystring.email", true))
+                        .requestValidatorOptions(
+                                RequestValidatorOptions.builder()
+                                        .requestValidatorName("OrdersGetValidator")
+                                        .validateRequestParameters(true)
+                                        .build())
+                        .build()); // Ex.: /orders?email={email}
         orders.addMethod(HttpMethod.DELETE.name(), ordersIntegration,
                 MethodOptions.builder()
                         .requestParameters(Map.of(
