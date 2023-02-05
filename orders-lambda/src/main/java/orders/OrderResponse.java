@@ -22,7 +22,7 @@ public class OrderResponse {
     @Getter
     @Setter
     @ToString
-    private static class Billing {
+    public static class Billing {
         private PaymentMethod paymentMethod;
         private BigDecimal totalPrice;
     }
@@ -30,7 +30,7 @@ public class OrderResponse {
     @Getter
     @Setter
     @ToString
-    private static class Product {
+    public static class Product {
         private String id;
         private String code;
         private BigDecimal price;
