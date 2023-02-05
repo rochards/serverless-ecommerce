@@ -6,8 +6,10 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import product.ProductModel;
 import product.ProductRepository;
 
+import java.util.List;
 import java.util.Objects;
 
 public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -23,30 +25,22 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
         var apiGtwRequestId = input.getRequestContext().getRequestId();
         var lambdaRequestId = context.getAwsRequestId();
 
-
         LOGGER.info("API Gateway RequestId = {} - Lambda RequestId = {}", apiGtwRequestId, lambdaRequestId);
 
         switch (method) {
             case "GET":
-                handleGetOrder(input);
-                break;
-
+                return handleGetOrder(input);
             case "POST":
-                handlePostOrder(input);
-                break;
-
+                return handlePostOrder(input);
             case "DELETE":
-                handleDeleteOrder(input);
-                break;
-
+                return handleDeleteOrder(input);
             default:
                 LOGGER.error("Method = {} not allowed", method);
+                return APIGatewayParseResponse.methodNotAllowed405();
         }
-
-        return null;
     }
 
-    private void handleGetOrder(APIGatewayProxyRequestEvent input) {
+    private APIGatewayProxyResponseEvent handleGetOrder(APIGatewayProxyRequestEvent input) {
         var email = input.getQueryStringParameters().get("email");
         var orderId = input.getQueryStringParameters().get("orderId");
         LOGGER.info("GET /orders?email={}&orderId={}", email, orderId);
@@ -56,15 +50,33 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
         } else {
             // tratar busca /orders?email={email}
         }
+
+        return null;
     }
 
-    private void handlePostOrder(APIGatewayProxyRequestEvent input) {
+    private APIGatewayProxyResponseEvent handlePostOrder(APIGatewayProxyRequestEvent input) {
         LOGGER.info("POST /orders");
+        var orderRequest = APIGatewayParseRequest.parsePostRequest(input);
+
+        List<ProductModel> foundProducts = productRepository.findByIds(orderRequest.getProductsIds());
+        if (foundProducts.size() != orderRequest.getProductsIds().size()) {
+            return APIGatewayParseResponse.badRequest400("Some orderRequest.productIds were not found in database");
+        }
+
+        var orderToSave = OrderParse.requestToModel(orderRequest, foundProducts);
+        orderRepository.save(orderToSave);
+
+        var orderResponse = OrderParse.modelToResponse(orderToSave);
+
+        LOGGER.info("Sending order response to client. OrderResponse = {}", orderResponse);
+        return APIGatewayParseResponse.created201(orderResponse);
     }
 
-    private void handleDeleteOrder(APIGatewayProxyRequestEvent input) {
+    private APIGatewayProxyResponseEvent handleDeleteOrder(APIGatewayProxyRequestEvent input) {
         var email = input.getQueryStringParameters().get("email");
         var orderId = input.getQueryStringParameters().get("orderId");
         LOGGER.info("DELETE /orders?email={}&orderId={}", email, orderId);
+
+        return null;
     }
 }
