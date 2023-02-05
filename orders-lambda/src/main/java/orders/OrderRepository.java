@@ -21,9 +21,10 @@ public class OrderRepository {
         this.mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.standard().build());
     }
 
-    public OrderModel save(OrderModel order) {
+    public void save(OrderModel order) {
+        LOGGER.info("Saving order = {} in dynamoDB", order);
         mapper.save(order);
-        return order;
+        LOGGER.info("Order = {} successfully saved in dynamoDB", order);
     }
 
     public List<OrderModel> findByEmail(String email) {
