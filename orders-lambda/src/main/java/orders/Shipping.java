@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-class Shipping {
+public class Shipping {
     private ShippingType type;
     private Carrier carrier;
 }

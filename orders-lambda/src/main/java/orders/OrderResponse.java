@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class OrdersResponse {
+public class OrderResponse {
 
     private String id;
     private String email;
