@@ -24,7 +24,7 @@ public class OrdersAppStack extends Stack {
         Table ordersDdbTable = createOrdersDdbTable();
 
         ordersHandler = createLambda("OrdersLambda", "orders.OrdersLambda",
-                "lambdas/orders/orders-lambda-1.0-SNAPSHOT.jar");
+                "lambdas/orders/orders-lambda-1.1-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
 
@@ -60,7 +60,7 @@ public class OrdersAppStack extends Stack {
                 .handler(handlerName) // É permitido referenciar o pacote.nome_da_classe se implementar a interface
                                       // RequestHandler
                 .memorySize(512)
-                .timeout(Duration.seconds(5))
+                .timeout(Duration.seconds(10))
                 .code(Code.fromAsset(pathToJar))
                 .runtime(Runtime.JAVA_11)
                 .logRetention(RetentionDays.ONE_DAY)

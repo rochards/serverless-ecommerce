@@ -33,7 +33,7 @@ public class OrderModel {
     @DynamoDBRangeKey(attributeName = RANGE_KEY_ATTRIBUTE_NAME)
     private String orderId;
 
-    @DynamoDBRangeKey(attributeName = "CreatedAt")
+    @DynamoDBAttribute(attributeName = "CreatedAt")
     private long createdAt;
 
     @DynamoDBAttribute(attributeName = "Shipping")
