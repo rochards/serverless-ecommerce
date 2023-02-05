@@ -19,7 +19,7 @@ public class OrdersAppStack extends Stack {
     private final Function ordersHandler;
 
     public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable) {
-        super(productsDdbTable, stackId, null);
+        super(scope, stackId, null);
 
         Table ordersDdbTable = createOrdersDdbTable();
 
