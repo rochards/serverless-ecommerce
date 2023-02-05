@@ -1,6 +1,8 @@
 package orders;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -22,6 +24,8 @@ public class OrderResponse {
     @Getter
     @Setter
     @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Billing {
         private PaymentMethod paymentMethod;
         private BigDecimal totalPrice;
@@ -30,6 +34,8 @@ public class OrderResponse {
     @Getter
     @Setter
     @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Product {
         private String id;
         private String code;

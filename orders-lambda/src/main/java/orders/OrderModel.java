@@ -8,7 +8,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -59,6 +61,8 @@ public class OrderModel {
     @Getter
     @Setter
     @DynamoDBDocument
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Shipping {
 
         @DynamoDBTypeConvertedEnum
@@ -82,6 +86,8 @@ public class OrderModel {
     @Getter
     @Setter
     @DynamoDBDocument
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Billing {
 
         @DynamoDBTypeConvertedEnum
@@ -104,6 +110,8 @@ public class OrderModel {
     @Getter
     @Setter
     @DynamoDBDocument
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Product {
 
         @DynamoDBAttribute(attributeName = "Id")

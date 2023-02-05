@@ -3,7 +3,6 @@ package common;
 import orders.OrderModel;
 import orders.OrderRequest;
 import orders.OrderResponse;
-import orders.PaymentMethod;
 import orders.Shipping;
 import product.ProductModel;
 
@@ -18,39 +17,20 @@ public class OrderParse {
         var order = new OrderModel();
         order.setEmail(orderRequest.getEmail());
         order.setCreatedAt(Instant.now().toEpochMilli());
-        order.setShipping(buildShippingModel(orderRequest.getShipping()));
-        order.setBilling(buildBillingModel(orderRequest.getPaymentMethod(), sumProductsPrice(productModels)));
+        order.setShipping(
+                new OrderModel.Shipping(orderRequest.getShipping().getType(), orderRequest.getShipping().getCarrier())
+        );
+        order.setBilling(
+                new OrderModel.Billing(orderRequest.getPaymentMethod(), sumProductsPrice(productModels))
+        );
         order.setProducts(buildOrderModelProducts(productModels));
 
         return order;
     }
 
-    private static OrderModel.Shipping buildShippingModel(Shipping shipping) {
-        var orderShipping = new OrderModel.Shipping();
-        orderShipping.setType(shipping.getType());
-        orderShipping.setCarrier(shipping.getCarrier());
-
-        return orderShipping;
-    }
-
-    private static OrderModel.Billing buildBillingModel(PaymentMethod paymentMethod, BigDecimal totalPrice) {
-        var billingModel = new OrderModel.Billing();
-        billingModel.setPaymentMethod(paymentMethod);
-        billingModel.setTotalPrice(totalPrice);
-
-        return billingModel;
-    }
-
     private static List<OrderModel.Product> buildOrderModelProducts(List<ProductModel> productModels) {
         return productModels.stream()
-                .map(product -> {
-                    var orderModelProduct = new OrderModel.Product();
-                    orderModelProduct.setId(product.getId());
-                    orderModelProduct.setCode(product.getCode());
-                    orderModelProduct.setPrice(product.getPrice());
-
-                    return orderModelProduct;
-                })
+                .map(product -> new OrderModel.Product(product.getId(), product.getCode(), product.getPrice()))
                 .collect(Collectors.toList());
     }
 
@@ -65,39 +45,20 @@ public class OrderParse {
         orderResponse.setId(order.getOrderId());
         orderResponse.setEmail(order.getEmail());
         orderResponse.setCreatedAt(order.getCreatedAt());
-        orderResponse.setBilling(buildBillingResponse(order.getBilling()));
-        orderResponse.setShipping(buildShippingResponse(order.getShipping()));
+        orderResponse.setBilling(
+                new OrderResponse.Billing(order.getBilling().getPaymentMethod(), order.getBilling().getTotalPrice())
+        );
+        orderResponse.setShipping(
+                new Shipping(order.getShipping().getType(), order.getShipping().getCarrier())
+        );
         orderResponse.setProducts(buildProductsResponse(order.getProducts()));
 
         return orderResponse;
     }
 
-    private static OrderResponse.Billing buildBillingResponse(OrderModel.Billing billing) {
-        var responseBilling = new OrderResponse.Billing();
-        responseBilling.setPaymentMethod(billing.getPaymentMethod());
-        responseBilling.setTotalPrice(billing.getTotalPrice());
-
-        return responseBilling;
-    }
-
-    private static Shipping buildShippingResponse(OrderModel.Shipping shipping) {
-        var shippingResponse = new Shipping();
-        shippingResponse.setType(shipping.getType());
-        shippingResponse.setCarrier(shipping.getCarrier());
-
-        return shippingResponse;
-    }
-
     private static List<OrderResponse.Product> buildProductsResponse(List<OrderModel.Product> products) {
         return products.stream()
-                .map(orderProduct -> {
-                    var productResponse = new OrderResponse.Product();
-                    productResponse.setId(orderProduct.getId());
-                    productResponse.setCode(orderProduct.getCode());
-                    productResponse.setPrice(orderProduct.getPrice());
-
-                    return productResponse;
-                })
+                .map(orderProduct -> new OrderResponse.Product(orderProduct.getId(), orderProduct.getCode(), orderProduct.getPrice()))
                 .collect(Collectors.toList());
     }
 }
