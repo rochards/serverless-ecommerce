@@ -1,9 +1,5 @@
-package common;
+package orders;
 
-import orders.OrderModel;
-import orders.OrderRequest;
-import orders.OrderResponse;
-import orders.Shipping;
 import product.ProductModel;
 
 import java.math.BigDecimal;
