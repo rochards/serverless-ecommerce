@@ -1,5 +1,6 @@
 package com.myorg;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import software.amazon.awscdk.RemovalPolicy;
@@ -8,7 +9,7 @@ import software.amazon.awscdk.services.apigateway.AccessLogFormat;
 import software.amazon.awscdk.services.apigateway.LambdaIntegration;
 import software.amazon.awscdk.services.apigateway.LogGroupLogDestination;
 import software.amazon.awscdk.services.apigateway.MethodOptions;
-import software.amazon.awscdk.services.apigateway.RequestValidatorOptions;
+import software.amazon.awscdk.services.apigateway.RequestValidator;
 import software.amazon.awscdk.services.apigateway.Resource;
 import software.amazon.awscdk.services.apigateway.RestApi;
 import software.amazon.awscdk.services.apigateway.StageOptions;
@@ -75,30 +76,31 @@ public class EcommerceApiGtwStack extends Stack {
         /* endpoint /orders */
         Resource orders = restApi.getRoot().addResource("orders");
         orders.addMethod(HttpMethod.POST.name(), ordersIntegration);
+        
+        RequestValidator requestValidator = RequestValidator.Builder.create(this, "OrdersValidator")
+                        .restApi(this.restApi)
+                        .requestValidatorName("OrdersValidator")
+                        .validateRequestParameters(true)
+                        .build();
         /*
          * para o DELETE e GET, vou indicar os parametros obrigatorios obrigatorios.
          * OBS.: o formato abaixo method.request.querystring.SEU_PARAMETRO é definido na doc do API gateway.
          */
+        Map<String, Boolean> getParameters = new HashMap<>();
+        getParameters.put("method.request.querystring.email", true);
         orders.addMethod(HttpMethod.GET.name(), ordersIntegration,
                 MethodOptions.builder()
-                        .requestParameters(Map.of(
-                                "method.request.querystring.email", true))
-                        .requestValidatorOptions(
-                                RequestValidatorOptions.builder()
-                                        .requestValidatorName("OrdersGetValidator")
-                                        .validateRequestParameters(true)
-                                        .build())
+                        .requestParameters(getParameters)
+                        .requestValidator(requestValidator)
                         .build()); // Ex.: /orders?email={email}
+
+        Map<String, Boolean> deleteParameters = new HashMap<>();
+        deleteParameters.put("method.request.querystring.email", true);
+        deleteParameters.put("method.request.querystring.orderId", true);
         orders.addMethod(HttpMethod.DELETE.name(), ordersIntegration,
                 MethodOptions.builder()
-                        .requestParameters(Map.of(
-                                "method.request.querystring.email", true,
-                                "method.request.querystring.orderId", true))
-                        .requestValidatorOptions(
-                                RequestValidatorOptions.builder()
-                                        .requestValidatorName("OrdersDeletionValidator")
-                                        .validateRequestParameters(true)
-                                        .build())
+                        .requestParameters(deleteParameters)
+                        .requestValidator(requestValidator)
                         .build());
     }
 }
