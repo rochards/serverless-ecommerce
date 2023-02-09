@@ -11,6 +11,7 @@ import product.ProductRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
@@ -43,15 +44,29 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
     private APIGatewayProxyResponseEvent handleGetOrder(APIGatewayProxyRequestEvent input) {
         var email = input.getQueryStringParameters().get("email");
         var orderId = input.getQueryStringParameters().get("orderId");
+
         LOGGER.info("GET /orders?email={}&orderId={}", email, orderId);
-
         if (Objects.nonNull(orderId)) {
-            // tratar busca /orders?email={email}&orderId={order_Id}
+            var optOrderModel = orderRepository.findByEmailAndOrderId(email, orderId);
+            return optOrderModel.map(orderModel -> {
+                        var orderResponse = OrderParse.modelToResponse(orderModel);
+                        LOGGER.info("Sending response to client. OrderResponse = {}", orderResponse);
+                        return APIGatewayParseResponse.ok200(orderResponse);
+                    })
+                    .orElseGet(() -> APIGatewayParseResponse.notFound404(String.format("Not found orderId = %s for email = %s", orderId, email)));
         } else {
-            // tratar busca /orders?email={email}
-        }
+            var ordersResponse = orderRepository.findByEmail(email)
+                    .stream()
+                    .map(OrderParse::modelToResponse)
+                    .collect(Collectors.toList());
 
-        return null;
+            if (!ordersResponse.isEmpty()) {
+                LOGGER.info("Sending response to client. OrderResponseList = {}", ordersResponse);
+                return APIGatewayParseResponse.ok200(ordersResponse);
+            }
+
+            return APIGatewayParseResponse.notFound404("Not found order for email = " + email);
+        }
     }
 
     private APIGatewayProxyResponseEvent handlePostOrder(APIGatewayProxyRequestEvent input) {
