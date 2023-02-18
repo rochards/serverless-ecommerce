@@ -53,14 +53,12 @@ public class OrderRepository {
     public Optional<OrderModel> deleteByEmailAndOrderId(String email, String orderId) {
         /* daria para deleter instanciando o objeto e setando apenas a rashkey e rangkey, mas como queremos retornar
         os atributos deletados, vamos pesquisar antes
-        var orderToDelete = new OrderModel();
-        orderToDelete.setEmail(email);
-        orderToDelete.setOrderId(orderId); */
+        */
 
         var optionalOrder = findByEmailAndOrderId(email, orderId);
 
         optionalOrder.ifPresent(orderModel -> {
-            LOGGER.info("Deleting order = {}", orderModel.toString());
+            LOGGER.info("Deleting order = {}", orderModel);
             mapper.delete(orderModel);
             LOGGER.info("Order deleted. orderId = {}", orderId);
         });
