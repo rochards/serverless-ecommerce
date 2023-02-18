@@ -92,6 +92,14 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
         var orderId = input.getQueryStringParameters().get("orderId");
         LOGGER.info("DELETE /orders?email={}&orderId={}", email, orderId);
 
-        return null;
+        var optDeletedOrder = orderRepository.deleteByEmailAndOrderId(email, orderId);
+
+        return optDeletedOrder.map(deletedOrder -> {
+                    var orderResponse = OrderParse.modelToResponse(deletedOrder);
+                    LOGGER.info("Sending response to client. OrderResponse = {}", orderResponse);
+
+                    return APIGatewayParseResponse.ok200(orderResponse);
+                })
+                .orElseGet(() -> APIGatewayParseResponse.notFound404(String.format("Not found orderId = %s for email = %s", orderId, email)));
     }
 }
