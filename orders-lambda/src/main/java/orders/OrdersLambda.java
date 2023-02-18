@@ -54,19 +54,19 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
                         return APIGatewayParseResponse.ok200(orderResponse);
                     })
                     .orElseGet(() -> APIGatewayParseResponse.notFound404(String.format("Not found orderId = %s for email = %s", orderId, email)));
-        } else {
-            var ordersResponse = orderRepository.findByEmail(email)
-                    .stream()
-                    .map(OrderParse::modelToResponse)
-                    .collect(Collectors.toList());
-
-            if (!ordersResponse.isEmpty()) {
-                LOGGER.info("Sending response to client. OrderResponseList = {}", ordersResponse);
-                return APIGatewayParseResponse.ok200(ordersResponse);
-            }
-
-            return APIGatewayParseResponse.notFound404("Not found order for email = " + email);
         }
+
+        var ordersResponse = orderRepository.findByEmail(email)
+                .stream()
+                .map(OrderParse::modelToResponse)
+                .collect(Collectors.toList());
+
+        if (!ordersResponse.isEmpty()) {
+            LOGGER.info("Sending response to client. OrderResponseList = {}", ordersResponse);
+            return APIGatewayParseResponse.ok200(ordersResponse);
+        }
+
+        return APIGatewayParseResponse.notFound404("Not found order for email = " + email);
     }
 
     private APIGatewayProxyResponseEvent handlePostOrder(APIGatewayProxyRequestEvent input) {
