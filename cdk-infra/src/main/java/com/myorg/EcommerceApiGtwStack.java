@@ -49,19 +49,54 @@ public class EcommerceApiGtwStack extends Stack {
         LambdaIntegration productsFetchIntegration = new LambdaIntegration(productsFetchHandler);
         LambdaIntegration productsAdminIntegration = new LambdaIntegration(productsAdminHandler);
 
+        RequestValidator requestValidator = RequestValidator.Builder.create(this, "ProductsValidator")
+                .restApi(this.restApi)
+                .requestValidatorName("ProductsValidator")
+                .validateRequestBody(true)
+                .build();
+
         /*
             endpoint /products
         */
+        MethodOptions methodOptions = MethodOptions.builder()
+                .requestValidator(requestValidator)
+                .requestModels(defineProductMapModel())
+                .build();
         Resource products = restApi.getRoot().addResource("products");
-        products.addMethod(HttpMethod.POST.name(), productsAdminIntegration);
+        products.addMethod(HttpMethod.POST.name(), productsAdminIntegration, methodOptions);
 
         /*
             endpoint /products/{id}
         */
         Resource productsId = products.addResource("{id}");
         productsId.addMethod(HttpMethod.GET.name(), productsFetchIntegration);
-        productsId.addMethod(HttpMethod.PUT.name(), productsAdminIntegration);
+        productsId.addMethod(HttpMethod.PUT.name(), productsAdminIntegration, methodOptions);
         productsId.addMethod(HttpMethod.DELETE.name(), productsAdminIntegration);
+    }
+
+    private Map<String, IModel> defineProductMapModel() {
+//        exemplo de como criar um mapeamento para a API e adicionar validacao
+        Map<String, JsonSchema> productModelAttributes = new HashMap<>();
+        productModelAttributes.put("name", JsonSchema.builder().type(JsonSchemaType.STRING).build());
+        productModelAttributes.put("code", JsonSchema.builder().type(JsonSchemaType.STRING).build());
+        productModelAttributes.put("model", JsonSchema.builder().type(JsonSchemaType.STRING).build());
+        productModelAttributes.put("price", JsonSchema.builder().type(JsonSchemaType.NUMBER).build());
+
+        Model productModel = Model.Builder.create(this, "ProductModel")
+                .modelName("ProductModel")
+                .restApi(this.restApi)
+                .schema(JsonSchema.builder()
+                        .schema(JsonSchemaVersion.DRAFT4)
+                        .title("ProductModelRequest")
+                        .type(JsonSchemaType.OBJECT)
+                        .properties(productModelAttributes)
+                        .required(List.of("name", "code", "model", "price"))
+                        .build())
+                .build();
+
+        Map<String, IModel> mapProductModel = new HashMap<>();
+        mapProductModel.put("application/json", productModel);
+        return mapProductModel;
     }
 
     private void setUpOrdersIntegration(Function ordersHandler) {
