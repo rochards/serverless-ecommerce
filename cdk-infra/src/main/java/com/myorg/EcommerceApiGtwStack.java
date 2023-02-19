@@ -1,22 +1,16 @@
 package com.myorg;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.sun.tools.javac.util.List;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.services.apigateway.AccessLogFormat;
-import software.amazon.awscdk.services.apigateway.LambdaIntegration;
-import software.amazon.awscdk.services.apigateway.LogGroupLogDestination;
-import software.amazon.awscdk.services.apigateway.MethodOptions;
-import software.amazon.awscdk.services.apigateway.RequestValidator;
-import software.amazon.awscdk.services.apigateway.Resource;
-import software.amazon.awscdk.services.apigateway.RestApi;
-import software.amazon.awscdk.services.apigateway.StageOptions;
+import software.amazon.awscdk.services.apigateway.*;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.HttpMethod;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EcommerceApiGtwStack extends Stack {
 
@@ -73,15 +67,23 @@ public class EcommerceApiGtwStack extends Stack {
     private void setUpOrdersIntegration(Function ordersHandler) {
         LambdaIntegration ordersIntegration = new LambdaIntegration(ordersHandler);
 
-        /* endpoint /orders */
-        Resource orders = restApi.getRoot().addResource("orders");
-        orders.addMethod(HttpMethod.POST.name(), ordersIntegration);
-        
         RequestValidator requestValidator = RequestValidator.Builder.create(this, "OrdersValidator")
                         .restApi(this.restApi)
                         .requestValidatorName("OrdersValidator")
                         .validateRequestParameters(true)
+                        .validateRequestBody(true)
                         .build();
+
+        /* endpoint /orders */
+        Map<String, IModel> mapOrderModel = defineOrderMapModel();
+        Resource orders = restApi.getRoot().addResource("orders");
+        orders.addMethod(HttpMethod.POST.name(), ordersIntegration,
+                MethodOptions.builder()
+                        .requestValidator(requestValidator)
+                        .requestModels(mapOrderModel)
+                        .build()
+                );
+
         /*
          * para o DELETE e GET, vou indicar os parametros obrigatorios obrigatorios.
          * OBS.: o formato abaixo method.request.querystring.SEU_PARAMETRO é definido na doc do API gateway.
@@ -102,5 +104,33 @@ public class EcommerceApiGtwStack extends Stack {
                         .requestParameters(deleteParameters)
                         .requestValidator(requestValidator)
                         .build());
+    }
+
+    private Map<String, IModel> defineOrderMapModel() {
+//        exemplo de como criar um mapeamento para a API e adicionar validacao
+        Map<String, JsonSchema> orderModelAttributes = new HashMap<>();
+        orderModelAttributes.put("email", JsonSchema.builder().type(JsonSchemaType.STRING).build());
+        orderModelAttributes.put("productsIds", JsonSchema.builder().type(JsonSchemaType.ARRAY)
+                .minItems(1)
+                .items(JsonSchema.builder().type(JsonSchemaType.STRING).build())
+                .build());
+        orderModelAttributes.put("paymentMethod", JsonSchema.builder().type(JsonSchemaType.STRING)
+                .enumValue(List.of("CASH", "DEBIT_CARD", "CREDIT_CARD")).build());
+
+        Model orderModel = Model.Builder.create(this, "OrderModel")
+                .modelName("OrderModel")
+                .restApi(this.restApi)
+                .schema(JsonSchema.builder()
+                        .schema(JsonSchemaVersion.DRAFT4)
+                        .title("OrderModelRequest")
+                        .type(JsonSchemaType.OBJECT)
+                        .properties(orderModelAttributes)
+                        .required(List.of("email", "productsIds", "paymentMethod"))
+                        .build())
+                .build();
+
+        Map<String, IModel> mapOrderModel = new HashMap<>();
+        mapOrderModel.put("application/json", orderModel);
+        return mapOrderModel;
     }
 }
