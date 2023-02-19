@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "924c781f-39b1-406e-941b-e9b4c7fe74fc",
+		"name": "serverless-ecommerce",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "products-lambda",
+			"item": [
+				{
+					"name": "Search product by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/products/ae6783df-3be8-4bb4-bd3b-29745bf26ba6",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"products",
+								"ae6783df-3be8-4bb4-bd3b-29745bf26ba6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "products-admin-lambda",
+			"item": [
+				{
+					"name": "Add new product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"new product\",\n    \"code\": \"product0005\",\n    \"model\": \"model0005\",\n    \"price\": 100.50,\n    \"urlImage\": \"https://newimage.bucket.aws\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url_apigtw}}/products",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product by id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"new product\",\n    \"code\": \"product0001\",\n    \"model\": \"model0001\",\n    \"price\": 120.5,\n    \"urlImage\": \"https://newimage.bucket.aws\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url_apigtw}}/products/666a2d8f-cd44-4f25-9189-dbd33d98a2ae",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"products",
+								"666a2d8f-cd44-4f25-9189-dbd33d98a2ae"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/products/49d2ecd2-9d20-4570-b1d1-d611c0fa400d",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"products",
+								"49d2ecd2-9d20-4570-b1d1-d611c0fa400d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "orders-lambda",
+			"item": [
+				{
+					"name": "Make new order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"consumer@gmail.com\",\n    \"productsIds\": [\"dd20b3ea-7443-429e-962a-ae0554fed376\"],\n    \"paymentMethod\": \"CREDIT_CARD\",\n    \"shipping\": {\n        \"type\": \"ECONOMIC\",\n        \"carrier\": \"CORREIOS\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url_apigtw}}/orders",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search order by email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "consumer@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search order by email and orderId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=8c8fb63d-bb70-4568-a561-f593c08953a7",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "consumer@gmail.com"
+								},
+								{
+									"key": "orderId",
+									"value": "8c8fb63d-bb70-4568-a561-f593c08953a7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete order by email and orderId Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=489623e6-7a4c-4665-bf7d-92577d70b838",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "consumer@gmail.com"
+								},
+								{
+									"key": "orderId",
+									"value": "489623e6-7a4c-4665-bf7d-92577d70b838"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

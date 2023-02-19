@@ -24,6 +24,8 @@ Os comandos devem ser executados dentro do diretório `cdk-infra`, pois é onde 
 
 ### Operações expostas pelo API Gateway ECommerceAPI
 
+As collections do Postman estao disponíveis na pasta `postman-collections`.
+
 #### Gerenciamento de produtos
 A última coluna destaca a função lambda responsável pela operação:
 
