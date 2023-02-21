@@ -4,6 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.rochards.orders.event.OrderEventParser;
+import com.rochards.orders.event.OrderEventPublisher;
+import com.rochards.orders.event.OrderTopic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.rochards.product.ProductModel;
@@ -19,6 +22,7 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
 
     private final OrderRepository orderRepository = new OrderRepository();
     private final ProductRepository productRepository = new ProductRepository();
+    private final OrderEventPublisher orderEventPublisher = new OrderEventPublisher();
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
@@ -32,9 +36,9 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
             case "GET":
                 return handleGetOrder(input);
             case "POST":
-                return handlePostOrder(input);
+                return handlePostOrder(input, lambdaRequestId);
             case "DELETE":
-                return handleDeleteOrder(input);
+                return handleDeleteOrder(input, lambdaRequestId);
             default:
                 LOGGER.error("Method = {} not allowed", method);
                 return APIGatewayParseResponse.methodNotAllowed405();
@@ -69,7 +73,7 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
         return APIGatewayParseResponse.notFound404("Not found order for email = " + email);
     }
 
-    private APIGatewayProxyResponseEvent handlePostOrder(APIGatewayProxyRequestEvent input) {
+    private APIGatewayProxyResponseEvent handlePostOrder(APIGatewayProxyRequestEvent input, String lambdaRequestId) {
         LOGGER.info("POST /orders");
         var orderRequest = APIGatewayParseRequest.parsePostRequest(input);
 
@@ -82,12 +86,13 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
         orderRepository.save(orderToSave);
 
         var orderResponse = OrderParse.modelToResponse(orderToSave);
+        orderEventPublisher.publishOrderEvent(OrderEventParser.responseToTopic(orderResponse, OrderTopic.Type.ORDER_CREATED, lambdaRequestId));
 
         LOGGER.info("Sending order response to client. OrderResponse = {}", orderResponse);
         return APIGatewayParseResponse.created201(orderResponse);
     }
 
-    private APIGatewayProxyResponseEvent handleDeleteOrder(APIGatewayProxyRequestEvent input) {
+    private APIGatewayProxyResponseEvent handleDeleteOrder(APIGatewayProxyRequestEvent input, String lambdaRequestId) {
         var email = input.getQueryStringParameters().get("email");
         var orderId = input.getQueryStringParameters().get("orderId");
         LOGGER.info("DELETE /orders?email={}&orderId={}", email, orderId);
@@ -96,6 +101,7 @@ public class OrdersLambda implements RequestHandler<APIGatewayProxyRequestEvent,
 
         return optDeletedOrder.map(deletedOrder -> {
                     var orderResponse = OrderParse.modelToResponse(deletedOrder);
+                    orderEventPublisher.publishOrderEvent(OrderEventParser.responseToTopic(orderResponse, OrderTopic.Type.ORDER_DELETED, lambdaRequestId));
                     LOGGER.info("Sending response to client. OrderResponse = {}", orderResponse);
 
                     return APIGatewayParseResponse.ok200(orderResponse);
