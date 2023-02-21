@@ -12,6 +12,7 @@ import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
+import software.amazon.awscdk.services.sns.Topic;
 import software.constructs.Construct;
 
 public class OrdersAppStack extends Stack {
@@ -22,15 +23,20 @@ public class OrdersAppStack extends Stack {
         super(scope, stackId, null);
 
         Table ordersDdbTable = createOrdersDdbTable();
+        Topic ordersTopic = createOrdersTopic();
 
         ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
                 "lambdas/orders/orders-lambda-1.3-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
+        ordersHandler.addEnvironment("ORDERS_TOPIC_ARN", ordersTopic.getTopicArn());
 
         // atribuindo permissoes para a lambda nas tabelas
         productsDdbTable.grantReadData(ordersHandler);
         ordersDdbTable.grantReadWriteData(ordersHandler);
+
+        // atribuindo permissoes para a lambda no topico
+        ordersTopic.grantPublish(ordersHandler);
     }
 
     private Table createOrdersDdbTable() {
@@ -51,6 +57,12 @@ public class OrdersAppStack extends Stack {
                                 .name("OrderId")
                                 .type(AttributeType.STRING)
                                 .build())
+                .build();
+    }
+
+    private Topic createOrdersTopic() {
+        return Topic.Builder.create(this, "OrdersTopic")
+                .topicName("OrdersTopic")
                 .build();
     }
 
