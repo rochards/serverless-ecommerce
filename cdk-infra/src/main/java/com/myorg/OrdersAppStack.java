@@ -23,8 +23,8 @@ public class OrdersAppStack extends Stack {
 
         Table ordersDdbTable = createOrdersDdbTable();
 
-        ordersHandler = createLambda("OrdersLambda", "orders.OrdersLambda",
-                "lambdas/orders/orders-lambda-1.2-SNAPSHOT.jar");
+        ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
+                "lambdas/orders/orders-lambda-1.3-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
 

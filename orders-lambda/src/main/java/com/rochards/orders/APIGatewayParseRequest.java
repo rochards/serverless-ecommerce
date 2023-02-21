@@ -1,4 +1,4 @@
-package orders;
+package com.rochards.orders;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.google.gson.Gson;
@@ -7,6 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class APIGatewayParseRequest {
+
+    private APIGatewayParseRequest() {
+    }
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger LOGGER = LogManager.getLogger(APIGatewayParseRequest.class);

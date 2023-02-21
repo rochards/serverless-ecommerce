@@ -1,4 +1,4 @@
-package product;
+package com.rochards.product;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -32,7 +32,7 @@ public class ProductRepository {
         Map<String, List<Object>> mappedProducts = mapper.batchLoad(products);
 
         products = mappedProducts.get(ProductModel.PRODUCTS_TABLE_NAME).stream()
-                .map(object -> (ProductModel) object)
+                .map(ProductModel.class::cast)
                 .collect(Collectors.toList());
 
         LOGGER.info("Found products: {}", products);

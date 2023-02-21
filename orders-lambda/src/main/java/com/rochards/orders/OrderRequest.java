@@ -1,4 +1,4 @@
-package orders;
+package com.rochards.orders;
 
 import lombok.Getter;
 import lombok.Setter;

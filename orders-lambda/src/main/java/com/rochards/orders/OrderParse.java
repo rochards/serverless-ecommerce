@@ -1,6 +1,6 @@
-package orders;
+package com.rochards.orders;
 
-import product.ProductModel;
+import com.rochards.product.ProductModel;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OrderParse {
+
+    private OrderParse() {
+    }
 
     public static OrderModel requestToModel(OrderRequest orderRequest, List<ProductModel> productModels) {
         var order = new OrderModel();

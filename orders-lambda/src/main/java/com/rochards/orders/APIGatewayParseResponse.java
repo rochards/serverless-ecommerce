@@ -1,4 +1,4 @@
-package orders;
+package com.rochards.orders;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
@@ -7,6 +7,9 @@ import com.google.gson.GsonBuilder;
 import java.util.Map;
 
 public class APIGatewayParseResponse {
+
+    private APIGatewayParseResponse() {
+    }
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Map<String, String> HEADERS = Map.of("Content-Type", "application/json");
