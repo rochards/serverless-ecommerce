@@ -45,7 +45,7 @@ public class OrderParse {
         orderResponse.setEmail(order.getEmail());
         orderResponse.setCreatedAt(order.getCreatedAt());
         orderResponse.setBilling(
-                new OrderResponse.Billing(order.getBilling().getPaymentMethod(), order.getBilling().getTotalPrice())
+                new Billing(order.getBilling().getPaymentMethod(), order.getBilling().getTotalPrice())
         );
         orderResponse.setShipping(
                 new Shipping(order.getShipping().getType(), order.getShipping().getCarrier())

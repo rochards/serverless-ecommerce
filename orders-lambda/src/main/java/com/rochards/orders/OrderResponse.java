@@ -26,16 +26,6 @@ public class OrderResponse {
     @ToString
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Billing {
-        private PaymentMethod paymentMethod;
-        private BigDecimal totalPrice;
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class Product {
         private String id;
         private String code;
