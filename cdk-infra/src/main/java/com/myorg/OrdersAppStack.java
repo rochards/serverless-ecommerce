@@ -13,13 +13,14 @@ import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.sns.Topic;
+import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
 import software.constructs.Construct;
 
 public class OrdersAppStack extends Stack {
 
     private final Function ordersHandler;
 
-    public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable) {
+    public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable, Table eventsDdbTable) {
         super(scope, stackId, null);
 
         Table ordersDdbTable = createOrdersDdbTable();
@@ -31,12 +32,17 @@ public class OrdersAppStack extends Stack {
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TOPIC_ARN", ordersTopic.getTopicArn());
 
+        Function orderEventsHandler = createLambda("OrderEventsLambda", "com.rochards.orders.OrderEventsLambda",
+                "lambdas/orders/order-events-lambda-1.0-SNAPSHOT.jar");
+        orderEventsHandler.addEnvironment("EVENTS_TABLE_NAME", eventsDdbTable.getTableName());
+
         // atribuindo permissoes para a lambda nas tabelas
         productsDdbTable.grantReadData(ordersHandler);
         ordersDdbTable.grantReadWriteData(ordersHandler);
 
-        // atribuindo permissoes para a lambda no topico
+        // atribuindo permissoes para as lambdas no topico
         ordersTopic.grantPublish(ordersHandler);
+        ordersTopic.addSubscription(new LambdaSubscription(orderEventsHandler));
     }
 
     private Table createOrdersDdbTable() {
