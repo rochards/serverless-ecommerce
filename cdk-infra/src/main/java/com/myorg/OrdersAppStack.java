@@ -7,6 +7,8 @@ import software.amazon.awscdk.services.dynamodb.Attribute;
 import software.amazon.awscdk.services.dynamodb.AttributeType;
 import software.amazon.awscdk.services.dynamodb.BillingMode;
 import software.amazon.awscdk.services.dynamodb.Table;
+import software.amazon.awscdk.services.iam.Effect;
+import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
@@ -15,6 +17,8 @@ import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.sns.Topic;
 import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
 import software.constructs.Construct;
+
+import java.util.*;
 
 public class OrdersAppStack extends Stack {
 
@@ -35,6 +39,17 @@ public class OrdersAppStack extends Stack {
         Function orderEventsHandler = createLambda("OrderEventsLambda", "com.rochards.orders.OrderEventsLambda",
                 "lambdas/orders/order-events-lambda-1.0-SNAPSHOT.jar");
         orderEventsHandler.addEnvironment("EVENTS_TABLE_NAME", eventsDdbTable.getTableName());
+        orderEventsHandler.addToRolePolicy(
+                /* exemplo de como ser específico para as operacoes no DynamoDB. Há tbm a possibilidade de vc colocar
+                * conditions, mas fica muito trabalhoso em java.
+                * */
+                PolicyStatement.Builder.create()
+                        .effect(Effect.ALLOW)
+                        .actions(Collections.singletonList("dynamodb:PutItem"))
+                        .resources(Collections.singletonList(eventsDdbTable.getTableArn()))
+                        .build()
+        );
+
 
         // atribuindo permissoes para a lambda nas tabelas
         productsDdbTable.grantReadData(ordersHandler);
