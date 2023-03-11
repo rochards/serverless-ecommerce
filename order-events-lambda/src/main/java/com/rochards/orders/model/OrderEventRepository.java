@@ -1,9 +1,11 @@
-package com.rochards.orders;
+package com.rochards.orders.model;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 public class OrderEventRepository {
     private static final Logger LOGGER = LogManager.getLogger(OrderEventRepository.class);
@@ -13,9 +15,9 @@ public class OrderEventRepository {
         this.mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.standard().build());
     }
 
-    public void save(OrderEventModel orderEvent) {
-        LOGGER.info("Saving OrderEventModel in DynamoDB: {}", orderEvent);
-        mapper.save(orderEvent);
-        LOGGER.info("OrderEventModel saved with success");
+    public void batchSave(List<OrderEventModel> orderEvents) {
+        LOGGER.info("Saving batch OrderEventModel in DynamoDB: {}", orderEvents);
+        mapper.batchSave(orderEvents);
+        LOGGER.info("Each OrderEventModel saved with success");
     }
 }

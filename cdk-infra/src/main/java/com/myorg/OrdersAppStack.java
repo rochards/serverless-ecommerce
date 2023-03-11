@@ -37,7 +37,7 @@ public class OrdersAppStack extends Stack {
         ordersHandler.addEnvironment("ORDERS_TOPIC_ARN", ordersTopic.getTopicArn());
 
         Function orderEventsHandler = createLambda("OrderEventsLambda", "com.rochards.orders.OrderEventsLambda",
-                "lambdas/orders/order-events-lambda-1.0-SNAPSHOT.jar");
+                "lambdas/orders/order-events-lambda-1.1-SNAPSHOT.jar");
         orderEventsHandler.addEnvironment("EVENTS_TABLE_NAME", eventsDdbTable.getTableName());
         orderEventsHandler.addToRolePolicy(
                 /* exemplo de como ser específico para as operacoes no DynamoDB. Há tbm a possibilidade de vc colocar
@@ -45,7 +45,7 @@ public class OrdersAppStack extends Stack {
                 * */
                 PolicyStatement.Builder.create()
                         .effect(Effect.ALLOW)
-                        .actions(Collections.singletonList("dynamodb:PutItem"))
+                        .actions(Arrays.asList("dynamodb:PutItem", "dynamodb:BatchWriteItem"))
                         .resources(Collections.singletonList(eventsDdbTable.getTableArn()))
                         .build()
         );

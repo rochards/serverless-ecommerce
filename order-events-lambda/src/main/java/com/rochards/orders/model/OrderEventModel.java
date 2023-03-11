@@ -1,9 +1,14 @@
-package com.rochards.orders;
+package com.rochards.orders.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.rochards.orders.EventType;
+import com.rochards.orders.OrderTopic;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -24,6 +29,9 @@ public class OrderEventModel {
     private String email;
     @DynamoDBAttribute(attributeName = "CreatedAt")
     private long createdAt;
+
+    @DynamoDBAttribute(attributeName = "RequestId")
+    private String requestId;
     @DynamoDBTypeConvertedEnum
     @DynamoDBAttribute(attributeName = "EventType")
     private EventType eventType;
@@ -31,6 +39,20 @@ public class OrderEventModel {
     private Info info;
     @DynamoDBAttribute(attributeName = "Ttl")
     private long ttl;
+
+    public OrderEventModel(OrderTopic orderTopic) {
+        var instant = Instant.now();
+        var orderEvent = orderTopic.getOrderEvent();
+
+        this.code = String.format("#order_%s", orderEvent.getOrderId());
+        this.eventTypeAndTimestamp = String.format("%s#%d", orderTopic.getType(), instant.toEpochMilli());
+        this.email = orderEvent.getEmail();
+        this.requestId = orderEvent.getLambdaRequestId();
+        this.eventType = orderTopic.getType();
+        this.info = new Info(orderEvent.getOrderId(), orderEvent.getProductCodes());
+        this.createdAt = instant.toEpochMilli();
+        this.ttl = instant.plus(Duration.ofMinutes(5)).getEpochSecond();
+    }
 
     @DynamoDBIgnore
     @Override
@@ -49,13 +71,12 @@ public class OrderEventModel {
     @Getter
     @Setter
     @DynamoDBDocument
-    private static class Info {
+    @AllArgsConstructor
+    public static class Info {
         @DynamoDBAttribute(attributeName = "OrderId")
         private String orderId;
         @DynamoDBAttribute(attributeName = "ProductCodes")
         private List<String> productCodes;
-        @DynamoDBAttribute(attributeName = "MessageId")
-        private String messageId;
 
         @DynamoDBIgnore
         @Override
@@ -63,7 +84,6 @@ public class OrderEventModel {
             return "Info{" +
                     "orderId='" + orderId + '\'' +
                     ", productCodes=" + productCodes +
-                    ", messageId='" + messageId + '\'' +
                     '}';
         }
     }
