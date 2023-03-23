@@ -2,11 +2,14 @@ package com.rochards.orders.event;
 
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
-import com.amazonaws.services.sns.model.PublishResult;
+import com.amazonaws.services.sns.model.MessageAttributeValue;
+import com.amazonaws.services.sns.model.PublishRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Map;
 
 public class OrderEventPublisher {
 
@@ -29,8 +32,27 @@ public class OrderEventPublisher {
 
     public void publishOrderEvent(OrderTopic orderTopic) {
         var orderTopicJson = gson.toJson(orderTopic);
+        /*
+        * Uma forma mais simples de fazer a publicação do evento seria:
+        * -> amazonSNS.publish(ORDERS_TOPIC_ARN, gson.toJson(orderTopic))
+        * A forma abaixo nos da mais flexibilidade. Estou enviando um eventType para eu posso configurar o SNS para invocar
+        * a lambda para determinados eventType, economizando em invocacoes. No momento de inserir a Lambda no topico, vc
+        * add tbm a filterPolicy.
+        * */
+        var messageAttributes = Map.of(
+                "eventType", new MessageAttributeValue()
+                        .withDataType("String")
+                        .withStringValue(orderTopic.getType().name())
+        );
+        var request = new PublishRequest()
+                .withTopicArn(ORDERS_TOPIC_ARN)
+                .withMessage(orderTopicJson)
+                .withMessageAttributes(messageAttributes);
+
         LOGGER.info("Publishing event = {} \nin topic ARN = {}", orderTopicJson, ORDERS_TOPIC_ARN);
-        PublishResult publish = amazonSNS.publish(ORDERS_TOPIC_ARN, gson.toJson(orderTopic));
+
+        var publish = amazonSNS.publish(request);
+
         LOGGER.info("Received response for lambdaRequestId = {}: MessageId = {}",
                 orderTopic.getOrderEvent().getLambdaRequestId(), publish.getMessageId());
     }
