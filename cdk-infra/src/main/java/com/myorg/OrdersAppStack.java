@@ -16,6 +16,8 @@ import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.sns.Topic;
 import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
+import software.amazon.awscdk.services.sns.subscriptions.SqsSubscription;
+import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
 import java.util.*;
@@ -30,11 +32,19 @@ public class OrdersAppStack extends Stack {
         Table ordersDdbTable = createOrdersDdbTable();
         Topic ordersTopic = createOrdersTopic();
 
+        Queue ordersQueue = createOrdersQueue();
+        ordersTopic.addSubscription(new SqsSubscription(ordersQueue)); // inscrevendo a Queue no topico SNS
+
         ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
                 "lambdas/orders/orders-lambda-2.2-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TOPIC_ARN", ordersTopic.getTopicArn());
+        // atribuindo permissoes para a lambda nas tabelas
+        productsDdbTable.grantReadData(ordersHandler);
+        ordersDdbTable.grantReadWriteData(ordersHandler);
+        // atribuindo permissoes para as lambdas no topico
+        ordersTopic.grantPublish(ordersHandler);
 
         Function orderEventsHandler = createLambda("OrderEventsLambda", "com.rochards.orders.OrderEventsLambda",
                 "lambdas/orders/order-events-lambda-1.1-SNAPSHOT.jar");
@@ -50,13 +60,6 @@ public class OrdersAppStack extends Stack {
                         .build()
         );
 
-
-        // atribuindo permissoes para a lambda nas tabelas
-        productsDdbTable.grantReadData(ordersHandler);
-        ordersDdbTable.grantReadWriteData(ordersHandler);
-
-        // atribuindo permissoes para as lambdas no topico
-        ordersTopic.grantPublish(ordersHandler);
         ordersTopic.addSubscription(new LambdaSubscription(orderEventsHandler));
     }
 
@@ -84,6 +87,12 @@ public class OrdersAppStack extends Stack {
     private Topic createOrdersTopic() {
         return Topic.Builder.create(this, "OrdersTopic")
                 .topicName("OrdersTopic")
+                .build();
+    }
+
+    private Queue createOrdersQueue() {
+        return Queue.Builder.create(this, "OrdersQueue")
+                .queueName("OrdersQueue")
                 .build();
     }
 
