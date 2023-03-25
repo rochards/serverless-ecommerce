@@ -15,6 +15,8 @@ import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.lambda.eventsources.SqsEventSource;
 import software.amazon.awscdk.services.logs.RetentionDays;
+import software.amazon.awscdk.services.sns.StringConditions;
+import software.amazon.awscdk.services.sns.SubscriptionFilter;
 import software.amazon.awscdk.services.sns.Topic;
 import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
 import software.amazon.awscdk.services.sns.subscriptions.SqsSubscription;
@@ -26,6 +28,7 @@ import java.util.*;
 public class OrdersAppStack extends Stack {
 
     private final Function ordersHandler;
+    private final Queue ordersQueue;
 
     public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable, Table eventsDdbTable) {
         super(scope, stackId, null);
@@ -33,9 +36,8 @@ public class OrdersAppStack extends Stack {
         Table ordersDdbTable = createOrdersDdbTable();
         Topic ordersTopic = createOrdersTopic();
 
-        Queue ordersQueue = createOrdersQueue();
-        ordersTopic.addSubscription(new SqsSubscription(ordersQueue)); // inscrevendo a Queue no topico SNS
-
+        ordersQueue = createOrdersQueue();
+        addOrdersQueueToOrdersTopic(ordersTopic);
 
         ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
                 "lambdas/orders/orders-lambda-2.2-SNAPSHOT.jar");
@@ -54,8 +56,8 @@ public class OrdersAppStack extends Stack {
         orderEventsHandler.addEnvironment("EVENTS_TABLE_NAME", eventsDdbTable.getTableName());
         orderEventsHandler.addToRolePolicy(
                 /* exemplo de como ser específico para as operacoes no DynamoDB. Há tbm a possibilidade de vc colocar
-                * conditions, mas fica muito trabalhoso em java.
-                * */
+                 * conditions, mas fica muito trabalhoso em java.
+                 * */
                 PolicyStatement.Builder.create()
                         .effect(Effect.ALLOW)
                         .actions(Arrays.asList("dynamodb:PutItem", "dynamodb:BatchWriteItem"))
@@ -104,11 +106,29 @@ public class OrdersAppStack extends Stack {
                 .build();
     }
 
+    private void addOrdersQueueToOrdersTopic(Topic ordersTopic) {
+        /*
+         * Criando filtro para o SNS enviar as mensagens para o SQS baseado no valor do eventType. Tanto o parametro "eventType"
+         * quanto seus possiveis valor foi definido na classe OrderEventPublisher do projeto orders-lambda
+         * */
+        Map<String, SubscriptionFilter> filterPolicy = new HashMap<>();
+        filterPolicy.put("eventType", SubscriptionFilter.stringFilter(
+                StringConditions.builder()
+                        .allowlist(Collections.singletonList("ORDER_CREATED"))
+                        .build())
+        );
+        ordersTopic.addSubscription(
+                SqsSubscription.Builder.create(ordersQueue)
+                        .filterPolicy(filterPolicy)
+                        .build()
+        );
+    }
+
     private Function createLambda(String lambdaName, String handlerName, String pathToJar) {
         return Function.Builder.create(this, lambdaName)
                 .functionName(lambdaName)
                 .handler(handlerName) // É permitido referenciar o pacote.nome_da_classe se implementar a interface
-                                      // RequestHandler
+                // RequestHandler
                 .memorySize(512)
                 .timeout(Duration.seconds(10))
                 .code(Code.fromAsset(pathToJar))
