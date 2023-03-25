@@ -31,7 +31,7 @@ public class OrdersAppStack extends Stack {
         Topic ordersTopic = createOrdersTopic();
 
         ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
-                "lambdas/orders/orders-lambda-2.1-SNAPSHOT.jar");
+                "lambdas/orders/orders-lambda-2.2-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TABLE_NAME", ordersDdbTable.getTableName());
         ordersHandler.addEnvironment("ORDERS_TOPIC_ARN", ordersTopic.getTopicArn());
