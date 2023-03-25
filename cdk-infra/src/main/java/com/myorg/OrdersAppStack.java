@@ -13,6 +13,7 @@ import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
+import software.amazon.awscdk.services.lambda.eventsources.SqsEventSource;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.sns.Topic;
 import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
@@ -35,6 +36,7 @@ public class OrdersAppStack extends Stack {
         Queue ordersQueue = createOrdersQueue();
         ordersTopic.addSubscription(new SqsSubscription(ordersQueue)); // inscrevendo a Queue no topico SNS
 
+
         ordersHandler = createLambda("OrdersLambda", "com.rochards.orders.OrdersLambda",
                 "lambdas/orders/orders-lambda-2.2-SNAPSHOT.jar");
         ordersHandler.addEnvironment("PRODUCTS_TABLE_NAME", productsDdbTable.getTableName());
@@ -45,6 +47,7 @@ public class OrdersAppStack extends Stack {
         ordersDdbTable.grantReadWriteData(ordersHandler);
         // atribuindo permissoes para as lambdas no topico
         ordersTopic.grantPublish(ordersHandler);
+
 
         Function orderEventsHandler = createLambda("OrderEventsLambda", "com.rochards.orders.OrderEventsLambda",
                 "lambdas/orders/order-events-lambda-1.1-SNAPSHOT.jar");
@@ -59,8 +62,13 @@ public class OrdersAppStack extends Stack {
                         .resources(Collections.singletonList(eventsDdbTable.getTableArn()))
                         .build()
         );
-
         ordersTopic.addSubscription(new LambdaSubscription(orderEventsHandler));
+
+
+        Function orderEmailsHandler = createLambda("OrderEmailsLambda", "com.rochards.orders.OrderEmailsLambda",
+                "lambdas/orders/order-emails-lambda-1.0-SNAPSHOT.jar");
+        orderEmailsHandler.addEventSource(new SqsEventSource(ordersQueue));
+        ordersQueue.grantConsumeMessages(orderEmailsHandler);
     }
 
     private Table createOrdersDdbTable() {
