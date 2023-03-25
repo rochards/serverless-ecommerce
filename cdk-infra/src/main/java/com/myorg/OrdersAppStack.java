@@ -69,8 +69,7 @@ public class OrdersAppStack extends Stack {
 
         Function orderEmailsHandler = createLambda("OrderEmailsLambda", "com.rochards.orders.OrderEmailsLambda",
                 "lambdas/orders/order-emails-lambda-1.0-SNAPSHOT.jar");
-        orderEmailsHandler.addEventSource(new SqsEventSource(ordersQueue));
-        ordersQueue.grantConsumeMessages(orderEmailsHandler);
+        configureSqsInvocationForOrderEmailsHandler(orderEmailsHandler);
     }
 
     private Table createOrdersDdbTable() {
@@ -138,6 +137,17 @@ public class OrdersAppStack extends Stack {
                 // .insightsVersion(LambdaInsightsVersion.VERSION_1_0_135_0) comentado para
                 // reduzir gastos na conta
                 .build();
+    }
+
+    private void configureSqsInvocationForOrderEmailsHandler(Function orderEmailsHandler) {
+        orderEmailsHandler.addEventSource(
+                SqsEventSource.Builder.create(ordersQueue)
+                        .batchSize(5) // quantidade de eventos que a Lambda vai pegar da fila
+                        .maxBatchingWindow(Duration.seconds(5)) /* significa q se der 5 segundos, independente do numero de mensagens,
+                                                                        a AWS Lambda vai infocar minha funcao */
+                        .build()
+        );
+        ordersQueue.grantConsumeMessages(orderEmailsHandler);
     }
 
     public Function getOrdersHandler() {
