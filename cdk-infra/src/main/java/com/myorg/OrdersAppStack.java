@@ -20,6 +20,7 @@ import software.amazon.awscdk.services.sns.SubscriptionFilter;
 import software.amazon.awscdk.services.sns.Topic;
 import software.amazon.awscdk.services.sns.subscriptions.LambdaSubscription;
 import software.amazon.awscdk.services.sns.subscriptions.SqsSubscription;
+import software.amazon.awscdk.services.sqs.DeadLetterQueue;
 import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
@@ -100,8 +101,19 @@ public class OrdersAppStack extends Stack {
     }
 
     private Queue createOrdersQueue() {
+        Queue ordersQueueDLQ = Queue.Builder.create(this, "OrdersQueueDLQ")
+                .queueName("OrdersQueueDLQ")
+                .retentionPeriod(Duration.minutes(30))
+                .build();
+
         return Queue.Builder.create(this, "OrdersQueue")
                 .queueName("OrdersQueue")
+                .deadLetterQueue(
+                        DeadLetterQueue.builder()
+                                .queue(ordersQueueDLQ)
+                                .maxReceiveCount(3) // numero de vezes antes de enviar a msg para a DLQ
+                                .build()
+                )
                 .build();
     }
 
