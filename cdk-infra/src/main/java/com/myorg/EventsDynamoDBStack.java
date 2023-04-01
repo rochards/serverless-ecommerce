@@ -2,10 +2,7 @@ package com.myorg;
 
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.services.dynamodb.Attribute;
-import software.amazon.awscdk.services.dynamodb.AttributeType;
-import software.amazon.awscdk.services.dynamodb.BillingMode;
-import software.amazon.awscdk.services.dynamodb.Table;
+import software.amazon.awscdk.services.dynamodb.*;
 import software.constructs.Construct;
 
 public class EventsDynamoDBStack extends Stack {
@@ -19,7 +16,7 @@ public class EventsDynamoDBStack extends Stack {
 
     private Table createTable() {
         String tableName = "EventsTable";
-        return Table.Builder.create(this, tableName)
+        Table table = Table.Builder.create(this, tableName)
                 .tableName(tableName)
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .billingMode(BillingMode.PROVISIONED)
@@ -39,6 +36,13 @@ public class EventsDynamoDBStack extends Stack {
                 )
                 .timeToLiveAttribute("Ttl")
                 .build();
+        table.autoScaleReadCapacity(
+                EnableScalingProps.builder()
+                        .minCapacity(3)
+                        .maxCapacity(5)
+                        .build()
+        );
+        return table;
     }
 
     public Table getEventsTable() {
