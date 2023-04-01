@@ -1,5 +1,6 @@
 package com.myorg;
 
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.dynamodb.*;
@@ -40,6 +41,12 @@ public class EventsDynamoDBStack extends Stack {
                 EnableScalingProps.builder()
                         .minCapacity(3)
                         .maxCapacity(5)
+                        .build()
+        ).scaleOnUtilization(
+                UtilizationScalingProps.builder()
+                        .targetUtilizationPercent(75)
+                        .scaleInCooldown(Duration.minutes(5))
+                        .scaleOutCooldown(Duration.minutes(1))
                         .build()
         );
         return table;
