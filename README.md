@@ -75,8 +75,22 @@ No DynamoDB precisamos apenas de definir a chave primária da tabela, no entanto
 | `ProductName` | String |
 
 
+#### Tabela de pedidos
+Essa tabela registra os pedidos na `OrdersTable` e possui a seguinte estrutura:
+
+| Atributo                        | Tipo no DynamoDB |
+| ------------------------------- | -----------------|
+| `Email` (hash key)              | String           |
+| `OrderId` (sort key)            | String           |
+| `Shipping`: {`Type`, `Carrier`} | Map              |
+| `CreatedAt`                     | Number           |
+| `Products`: [{`Id`,`Price`, `Code`}] | List             |
+| `Billing`: {`TotalPrice`, `PaymentMethod`} | Map   |
+
+em especial, `Price` e `TotalPrice` são ambos do tipo Number. Já, `Id`, `Type`, `Carrier`, `Code` e `PaymentMethod` são String.
+
 #### Tabela de eventos
-O objetivo desta tabela é manter um registro de alterações realizadas na `ProductsTable`. Tal tabela é chamada `EventsTable` e possui os seguintes atributos:
+O objetivo desta tabela é manter um registro de alterações realizadas na `ProductsTable` e `OrdersTable`. Tal tabela é chamada `EventsTable` e possui os seguintes atributos:
 
 | Atributo                            | Tipo no DynamoDB |
 | ----------------------------------- | ---------------- |
@@ -91,20 +105,7 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 
 em especial, `ProductId` é do tipo String e `ProductPrice` do tipo Number.
 
-
-#### Tabela de pedidos
-Essa tabela registra os pedidos na `OrdersTable` e possui a seguinte estrutura:
-
-| Atributo                        | Tipo no DynamoDB |
-| ------------------------------- | -----------------|
-| `Email` (hash key)              | String           |
-| `OrderId` (sort key)            | String           |
-| `Shipping`: {`Type`, `Carrier`} | Map              |
-| `CreatedAt`                     | Number           |
-| `Products`: [{`Id`,`Price`, `Code`}] | List             |
-| `Billing`: {`TotalPrice`, `PaymentMethod`} | Map   |
-
-em especial, `Price` e `TotalPrice` são ambos do tipo Number. Já, `Id`, `Type`, `Carrier`, `Code` e `PaymentMethod` são String.
+A tabela de eventos ainda vai contar com um **GSI** (Global Secondary Index) com todos os atributos da tabela principal. A _hash key_ agora será o atributo `Email` e a _sort key_ o atributo `EventType`.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 

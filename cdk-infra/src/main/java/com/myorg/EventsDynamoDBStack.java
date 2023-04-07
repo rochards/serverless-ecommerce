@@ -37,6 +37,7 @@ public class EventsDynamoDBStack extends Stack {
                 )
                 .timeToLiveAttribute("Ttl")
                 .build();
+
         table.autoScaleReadCapacity(
                 EnableScalingProps.builder()
                         .minCapacity(3)
@@ -49,6 +50,24 @@ public class EventsDynamoDBStack extends Stack {
                         .scaleOutCooldown(Duration.minutes(1))
                         .build()
         );
+
+        table.addGlobalSecondaryIndex(
+                GlobalSecondaryIndexProps.builder()
+                        .indexName("EmailAndEventTypeIndex")
+                        .partitionKey(
+                                Attribute.builder()
+                                        .name("Email")
+                                        .type(AttributeType.STRING)
+                                        .build()
+                        )
+                        .sortKey(
+                                Attribute.builder()
+                                        .name("EventType")
+                                        .type(AttributeType.STRING)
+                                        .build()
+                        )
+                        .projectionType(ProjectionType.ALL)
+                        .build());
         return table;
     }
 
