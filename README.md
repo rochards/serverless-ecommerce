@@ -123,7 +123,8 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 ### Observações
 - Para habilitar o X-Ray bastou apenas eu adicionar as dependências no `pom.xml`, não precisei adicionar nenhum novo código nas aplicações das Lambdas. Já no cdk eu precisei habilitar o tracing.
 - Para habilitar o LambdaInsights é preciso ficar atento a qual versão será utilizar no projeto do cdk, pois não há disponibilidade em todas as regiões, consultem em [lambda insights versions for x86-64 plataforms](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Lambda-Insights-extension-versionsx86-64.html). Será adicionado de forma transparente uma layer a função lambda;
-- :bug: há um bug na invocação assíncrona da lambda `products-admin` e `products-event`. Sempre a `products-event`acaba sendo invocada 3 vezes, inserindo 3 registros de eventos repetidos na tabela `events` do dynamodb.
+- :bug: há um bug na invocação assíncrona da lambda `products-admin` e `products-event`. Sempre a `products-event`acaba sendo invocada 3 vezes, inserindo 3 registros de eventos repetidos na tabela `events` do dynamodb;
+- decide não fazer a implementação de enviar e-mails na `oder-emails-lambda`.
 
 ### Referências
 - [Creating a serverless application using the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/serverless_example.html)
