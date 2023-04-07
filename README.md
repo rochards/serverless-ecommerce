@@ -38,7 +38,7 @@ A última coluna destaca a função lambda responsável pela operação:
 
 #### Gerenciamento de pedidos
 
-Todas as operações são realizadas pela Lambda `orders`:
+Todas as operações são realizadas pela `orders-lambda`:
 
 | Operação | Endpoint | Verbo HTTP |
 | -------- | -------- | ---------- |
