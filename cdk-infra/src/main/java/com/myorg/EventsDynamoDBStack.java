@@ -62,7 +62,7 @@ public class EventsDynamoDBStack extends Stack {
                         )
                         .sortKey(
                                 Attribute.builder()
-                                        .name("EventType")
+                                        .name("EventTypeAndTimestamp")
                                         .type(AttributeType.STRING)
                                         .build()
                         )
