@@ -19,12 +19,12 @@ public class EcommerceApiGtwStack extends Stack {
 
 
     public EcommerceApiGtwStack(Construct scope, String stackId, Function productsFetchHandler,
-                                Function productsAdminHandler, Function ordersHandler) {
+                                Function productsAdminHandler, Function ordersHandler, Function ordersEventsFetchHandler) {
         super(scope, stackId, null);
 
         restApi = setUpRestApi();
         setUpProductsIntegrations(productsFetchHandler, productsAdminHandler);
-        setUpOrdersIntegration(ordersHandler);
+        setUpOrdersIntegration(ordersHandler, ordersEventsFetchHandler);
     }
 
     private RestApi setUpRestApi() {
@@ -99,15 +99,15 @@ public class EcommerceApiGtwStack extends Stack {
         return mapProductModel;
     }
 
-    private void setUpOrdersIntegration(Function ordersHandler) {
+    private void setUpOrdersIntegration(Function ordersHandler, Function ordersEventsFetchHandler) {
         LambdaIntegration ordersIntegration = new LambdaIntegration(ordersHandler);
 
         RequestValidator requestValidator = RequestValidator.Builder.create(this, "OrdersValidator")
-                        .restApi(this.restApi)
-                        .requestValidatorName("OrdersValidator")
-                        .validateRequestParameters(true)
-                        .validateRequestBody(true)
-                        .build();
+                .restApi(this.restApi)
+                .requestValidatorName("OrdersValidator")
+                .validateRequestParameters(true)
+                .validateRequestBody(true)
+                .build();
 
         /* endpoint /orders */
         Map<String, IModel> mapOrderModel = defineOrderMapModel();
@@ -117,17 +117,18 @@ public class EcommerceApiGtwStack extends Stack {
                         .requestValidator(requestValidator)
                         .requestModels(mapOrderModel)
                         .build()
-                );
+        );
 
         /*
          * para o DELETE e GET, vou indicar os parametros obrigatorios obrigatorios.
          * OBS.: o formato abaixo method.request.querystring.SEU_PARAMETRO é definido na doc do API gateway.
          */
-        Map<String, Boolean> getParameters = new HashMap<>();
-        getParameters.put("method.request.querystring.email", true);
+        Map<String, Boolean> getParametersForOrders = new HashMap<>();
+        getParametersForOrders.put("method.request.querystring.email", true);
+        getParametersForOrders.put("method.request.querystring.orderId", false);
         orders.addMethod(HttpMethod.GET.name(), ordersIntegration,
                 MethodOptions.builder()
-                        .requestParameters(getParameters)
+                        .requestParameters(getParametersForOrders)
                         .requestValidator(requestValidator)
                         .build()); // Ex.: /orders?email={email}
 
@@ -139,6 +140,21 @@ public class EcommerceApiGtwStack extends Stack {
                         .requestParameters(deleteParameters)
                         .requestValidator(requestValidator)
                         .build());
+
+
+        /* endpoint /orders/events */
+        LambdaIntegration ordersEventsFetchIntegration = new LambdaIntegration(ordersEventsFetchHandler);
+
+        Map<String, Boolean> getParametersForOrdersEvents = new HashMap<>();
+        getParametersForOrdersEvents.put("method.request.querystring.email", true);
+        getParametersForOrdersEvents.put("method.request.querystring.eventType", false);
+
+        Resource ordersEvents = orders.addResource("events");
+        ordersEvents.addMethod(HttpMethod.GET.name(), ordersEventsFetchIntegration,
+                MethodOptions.builder()
+                        .requestParameters(getParametersForOrdersEvents)
+                        .requestValidator(requestValidator)
+                        .build()); // Ex.: /orders?email={email}
     }
 
     private Map<String, IModel> defineOrderMapModel() {

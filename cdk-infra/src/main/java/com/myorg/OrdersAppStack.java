@@ -24,12 +24,16 @@ import software.amazon.awscdk.services.sqs.DeadLetterQueue;
 import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrdersAppStack extends Stack {
 
     private final Function ordersHandler;
     private final Queue ordersQueue;
+    private final Function ordersEventsFetchHandler;
 
     public OrdersAppStack(Construct scope, String stackId, Table productsDdbTable, Table eventsDdbTable) {
         super(scope, stackId, null);
@@ -71,6 +75,18 @@ public class OrdersAppStack extends Stack {
         Function orderEmailsHandler = createLambda("OrderEmailsLambda", "com.rochards.orders.OrderEmailsLambda",
                 "lambdas/orders/order-emails-lambda-1.0-SNAPSHOT.jar");
         configureSqsInvocationForOrderEmailsHandler(orderEmailsHandler);
+
+
+        ordersEventsFetchHandler = createLambda("OrdersEventsFetch", "com.rochards.orders.OrdersEventsFetch",
+                "lambdas/orders/orders-events-fetch-1.0-SNAPSHOT.jar");
+        ordersEventsFetchHandler.addToRolePolicy(
+                // O GSI EmailAndEventTypeIndex foi definido na classe EventsDynamoDBStack
+                PolicyStatement.Builder.create()
+                        .effect(Effect.ALLOW)
+                        .actions(Collections.singletonList("dynamodb:Query"))
+                        .resources(Collections.singletonList(eventsDdbTable.getTableArn() + "/index/EmailAndEventTypeIndex"))
+                        .build()
+        );
     }
 
     private Table createOrdersDdbTable() {
@@ -164,5 +180,9 @@ public class OrdersAppStack extends Stack {
 
     public Function getOrdersHandler() {
         return ordersHandler;
+    }
+
+    public Function getOrdersEventsFetchHandler() {
+        return ordersEventsFetchHandler;
     }
 }
