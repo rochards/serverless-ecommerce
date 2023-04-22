@@ -78,7 +78,7 @@ public class OrdersAppStack extends Stack {
 
 
         ordersEventsFetchHandler = createLambda("OrdersEventsFetch", "com.rochards.orders.OrdersEventsFetch",
-                "lambdas/orders/orders-events-fetch-1.0-SNAPSHOT.jar");
+                "lambdas/orders/orders-events-fetch-1.1-SNAPSHOT.jar");
         ordersEventsFetchHandler.addToRolePolicy(
                 // O GSI EmailAndEventTypeIndex foi definido na classe EventsDynamoDBStack
                 PolicyStatement.Builder.create()

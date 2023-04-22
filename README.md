@@ -60,6 +60,15 @@ Abaixo segue um exemplo de payload na criação de um pedido:
 }
 ```
 
+#### Consulta a eventos
+
+Todas as operações são realizadas pela `orders-events-fetch`:
+
+| Operação | Endpoint | Verbo HTTP |
+| -------- | -------- | ---------- |
+| Listar eventos associados a um usuário | `/orders/events?email={email}` | GET |
+
+
 ### Modelagem das tabelas no DynamoDB
 
 #### Tabela de produtos

@@ -7,17 +7,33 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrdersEventsFetch implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Logger LOGGER = LogManager.getLogger(OrdersEventsFetch.class);
+    private final OrdersEventsRepository repository = new OrdersEventsRepository();
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
-        LOGGER.info("apiGatewayProxyRequestEvent: {}", apiGatewayProxyRequestEvent);
-        var response = new APIGatewayProxyResponseEvent();
-        response.setStatusCode(204);
-        response.setHeaders(Map.of("Content-Type", "application/json"));
-        return response;
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
+        var apiGtwRequestId = input.getRequestContext().getRequestId();
+        var lambdaRequestId = context.getAwsRequestId();
+
+        LOGGER.info("API Gateway RequestId = {} - Lambda RequestId = {}", apiGtwRequestId, lambdaRequestId);
+
+        return handleGetEvents(input);
+    }
+
+    private APIGatewayProxyResponseEvent handleGetEvents(APIGatewayProxyRequestEvent input) {
+        var email = input.getQueryStringParameters().get("email");
+        var eventType = input.getQueryStringParameters().get("eventType");
+
+        LOGGER.info("GET /orders?email={}&eventType={}", email, eventType);
+        List<OrderEventResponse> responses = repository.findByEmail(email)
+                .stream()
+                .map(OrdersEventsParser::toResponse)
+                .collect(Collectors.toList());
+
+        return APIGatewayParserResponse.ok200(responses);
     }
 }
