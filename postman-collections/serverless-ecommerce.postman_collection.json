@@ -14,13 +14,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url_apigtw}}/products/ae6783df-3be8-4bb4-bd3b-29745bf26ba6",
+							"raw": "{{url_apigtw}}/products/973b880d-b8b5-4b4c-96cc-71347324bbfc",
 							"host": [
 								"{{url_apigtw}}"
 							],
 							"path": [
 								"products",
-								"ae6783df-3be8-4bb4-bd3b-29745bf26ba6"
+								"973b880d-b8b5-4b4c-96cc-71347324bbfc"
 							]
 						}
 					},
@@ -38,7 +38,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"new product\",\n    \"code\": \"product0005\",\n    \"model\": \"model0005\",\n    \"price\": 100.50,\n    \"urlImage\": \"https://newimage.bucket.aws\"\n}",
+							"raw": "{\n    \"name\": \"new product\",\n    \"code\": \"product0003\",\n    \"model\": \"model0003\",\n    \"price\": 100.50,\n    \"urlImage\": \"https://newimage.bucket.aws\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -90,13 +90,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url_apigtw}}/products/49d2ecd2-9d20-4570-b1d1-d611c0fa400d",
+							"raw": "{{url_apigtw}}/products/06f7b1f5-a666-4b3f-8c4b-ea3d6ed150f9",
 							"host": [
 								"{{url_apigtw}}"
 							],
 							"path": [
 								"products",
-								"49d2ecd2-9d20-4570-b1d1-d611c0fa400d"
+								"06f7b1f5-a666-4b3f-8c4b-ea3d6ed150f9"
 							]
 						}
 					},
@@ -114,7 +114,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"consumer@gmail.com\",\n    \"productsIds\": [\"dd20b3ea-7443-429e-962a-ae0554fed376\"],\n    \"paymentMethod\": \"CREDIT_CARD\",\n    \"shipping\": {\n        \"type\": \"ECONOMIC\",\n        \"carrier\": \"CORREIOS\"\n    }\n}",
+							"raw": "{\n    \"email\": \"consumer2@gmail.com\",\n    \"productsIds\": [\"0129b4cb-7539-4c3c-9326-cbba31cc8a0b\", \"219aa351-3985-4d9b-ad58-dc84ec8514c8\"],\n    \"paymentMethod\": \"CREDIT_CARD\",\n    \"shipping\": {\n        \"type\": \"ECONOMIC\",\n        \"carrier\": \"CORREIOS\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -162,7 +162,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=8c8fb63d-bb70-4568-a561-f593c08953a7",
+							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=bcf91f97-d8c7-4563-9020-d585f90827cc",
 							"host": [
 								"{{url_apigtw}}"
 							],
@@ -176,7 +176,7 @@
 								},
 								{
 									"key": "orderId",
-									"value": "8c8fb63d-bb70-4568-a561-f593c08953a7"
+									"value": "bcf91f97-d8c7-4563-9020-d585f90827cc"
 								}
 							]
 						}
@@ -189,7 +189,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=489623e6-7a4c-4665-bf7d-92577d70b838",
+							"raw": "{{url_apigtw}}/orders?email=consumer@gmail.com&orderId=06f7b1f5-a666-4b3f-8c4b-ea3d6ed150f9",
 							"host": [
 								"{{url_apigtw}}"
 							],
@@ -203,7 +203,64 @@
 								},
 								{
 									"key": "orderId",
-									"value": "489623e6-7a4c-4665-bf7d-92577d70b838"
+									"value": "06f7b1f5-a666-4b3f-8c4b-ea3d6ed150f9"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "orders-events-fetch",
+			"item": [
+				{
+					"name": "Search by email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/orders/events?email=consumer2@gmail.com",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders",
+								"events"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "consumer2@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by email and eventType",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url_apigtw}}/orders/events?email=consumer2@gmail.com&eventType=ORDER_DELETED",
+							"host": [
+								"{{url_apigtw}}"
+							],
+							"path": [
+								"orders",
+								"events"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "consumer2@gmail.com"
+								},
+								{
+									"key": "eventType",
+									"value": "ORDER_DELETED"
 								}
 							]
 						}
