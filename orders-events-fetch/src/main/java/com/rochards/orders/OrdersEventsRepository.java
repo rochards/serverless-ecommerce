@@ -21,20 +21,6 @@ public class OrdersEventsRepository {
         this.mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.standard().build());
     }
 
-//    public Optional<OrdersEventsModel> findByEmailAndEventType(String email, String eventType) {
-//        var queryExpression = new DynamoDBQueryExpression<OrdersEventsModel>()
-//                .withIndexName(OrdersEventsModel.GSI_NAME)
-//                .withKeyConditionExpression(
-//                        String.format("%s = :v_email and begins_with(%s, :v_eventType)", OrdersEventsModel.HASH_KEY_GSI_ATTRIBUTE_NAME, OrdersEventsModel.RANGE_KEY_GSI_ATTRIBUTE_NAME)
-//                )
-//                .withExpressionAttributeValues(Map.ofEntries(
-//                        Map.entry(":v_email", new AttributeValue().withS(email)),
-//                        Map.entry(":v_eventType", new AttributeValue().withS(eventType))
-//                ));
-//
-//        return null;
-//    }
-
     public List<OrderEventModel> findByEmail(String email) {
         var queryExpression = new DynamoDBQueryExpression<OrderEventModel>()
                 .withIndexName(OrderEventModel.GSI_NAME)
@@ -54,9 +40,23 @@ public class OrdersEventsRepository {
         return new ArrayList<>(events);
     }
 
-    /*
-    * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.client.QueryGSI.java-sdk-v1.html
-    * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#Query.KeyConditionExpressions
-    * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
-    * */
+    public List<OrderEventModel> findByEmailAndEventType(String email, String eventType) {
+        var queryExpression = new DynamoDBQueryExpression<OrderEventModel>()
+                .withIndexName(OrderEventModel.GSI_NAME)
+                .withConsistentRead(false) // sou obrigado a informar por estar consulta em um GSI
+                .withKeyConditionExpression(
+                        String.format("%s = :v_email and begins_with(%s, :v_eventType)", OrderEventModel.HASH_KEY_GSI_ATTRIBUTE_NAME, OrderEventModel.RANGE_KEY_GSI_ATTRIBUTE_NAME)
+                )
+                .withExpressionAttributeValues(Map.ofEntries(
+                        Map.entry(":v_email", new AttributeValue().withS(email)),
+                        Map.entry(":v_eventType", new AttributeValue().withS(eventType))
+                ));
+
+        LOGGER.info("Finding events for email: {}, eventType: {}", email, eventType);
+
+        PaginatedQueryList<OrderEventModel> events = mapper.query(OrderEventModel.class, queryExpression);
+
+        LOGGER.info("Email: {}, eventType: {}. Found count: {}", email, eventType, events.size());
+        return new ArrayList<>(events);
+    }
 }

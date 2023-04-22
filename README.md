@@ -67,6 +67,9 @@ Todas as operações são realizadas pela `orders-events-fetch`:
 | Operação | Endpoint | Verbo HTTP |
 | -------- | -------- | ---------- |
 | Listar eventos associados a um usuário | `/orders/events?email={email}` | GET |
+| Listar eventos associados a um usuário por tipo | `/orders/events?email={email}&eventType={eventType}` | GET |
+
+o parâmetro `eventType` só aceita os valores `ORDER_DELETED` e `ORDER_CREATED`.
 
 
 ### Modelagem das tabelas no DynamoDB
