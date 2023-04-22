@@ -105,7 +105,7 @@ O objetivo desta tabela é manter um registro de alterações realizadas na `Pro
 
 em especial, `ProductId` é do tipo String e `ProductPrice` do tipo Number.
 
-A tabela de eventos ainda vai contar com um **GSI** (Global Secondary Index) com todos os atributos da tabela principal. A _hash key_ agora será o atributo `Email` e a _sort key_ o atributo `EventType`.
+A tabela de eventos ainda vai contar com um **GSI** (Global Secondary Index) com todos os atributos da tabela principal. A _hash key_ agora será o atributo `Email` e a _sort key_ o atributo `EventTypeAndTimestamp`.
 
 ### Como as lambdas estão sendo empacotadas para o deploy
 
