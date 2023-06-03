@@ -45,6 +45,20 @@
             <version>${cdk.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/apigatewayv2-alpha -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>apigatewayv2-alpha</artifactId>
+            <version>2.82.0-alpha.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/apigatewayv2-integrations-alpha -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>apigatewayv2-integrations-alpha</artifactId>
+            <version>2.82.0-alpha.0</version>
+        </dependency>
+
+
         <dependency>
             <groupId>software.constructs</groupId>
             <artifactId>constructs</artifactId>

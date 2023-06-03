@@ -3,6 +3,9 @@ package com.myorg;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.services.apigatewayv2.alpha.WebSocketApi;
+import software.amazon.awscdk.services.apigatewayv2.alpha.WebSocketRouteOptions;
+import software.amazon.awscdk.services.apigatewayv2.integrations.alpha.WebSocketLambdaIntegration;
 import software.amazon.awscdk.services.dynamodb.Attribute;
 import software.amazon.awscdk.services.dynamodb.AttributeType;
 import software.amazon.awscdk.services.dynamodb.BillingMode;
@@ -24,14 +27,28 @@ public class InvoiceApiStack extends Stack {
         Bucket invoicesBucket = createBucket();
 
         // para o WebSocket
-        Function connectionHandler = createLambda("InvoiceConnectionLambda",
-                "com.rochards.invoices.InvoiceConnectionLambda",
-                "lambdas/invoices/invoice-connection-lambda-1.0-SNAPSHOT.jar"
+        Function connectionHandler = createLambda("WebSocketConnectionLambda",
+                "com.rochards.invoices.WebSocketConnectionLambda",
+                "lambdas/invoices/websocket-connection-lambda-1.0-SNAPSHOT.jar"
         );
-        Function disconnectionHandler = createLambda("InvoiceDisconnectionLambda",
-                "com.rochards.invoices.InvoiceDisconnectionLambda",
-                "lambdas/invoices/invoice-disconnection-lambda-1.0-SNAPSHOT.jar"
+        Function disconnectionHandler = createLambda("WebSocketDisconnectionLambda",
+                "com.rochards.invoices.WebSocketDisconnectionLambda",
+                "lambdas/invoices/websocket-disconnection-lambda-1.0-SNAPSHOT.jar"
         );
+
+        WebSocketApi webSocketApi = WebSocketApi.Builder.create(this, "InvoiceWSApi")
+                .apiName("InvoiceWebSocketApi")
+                .connectRouteOptions(
+                        WebSocketRouteOptions.builder()
+                                .integration(new WebSocketLambdaIntegration("WebSocketConnectionHandler", connectionHandler))
+                                .build()
+                )
+                .disconnectRouteOptions(
+                        WebSocketRouteOptions.builder()
+                                .integration(new WebSocketLambdaIntegration("WebSocketDisconnectionHandler", disconnectionHandler))
+                                .build()
+                )
+                .build();
 
     }
 
