@@ -188,3 +188,4 @@ como podemos ver do trecho de código acima, é esperado que dentro de `cdk-infr
 - [Instrumenting Java code in AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/java-tracing.html)
 - [AWS X-Ray SDK for Java](https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java.html)
 - [Java: DynamoDBMapper](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
+- [WebSocket API Reference](https://docs.aws.amazon.com/cdk/api/v2/java/software/amazon/awscdk/services/apigatewayv2/alpha/package-summary.html#websocket-api)
