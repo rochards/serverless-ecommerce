@@ -4,11 +4,13 @@
 
 Aplicação construída com a finalidade de estudar os recursos disponíveis na AWS. Estou seguindo o curso disponível no link https://www.udemy.com/course/aws-serverless-nodejs-cdk-pt/, porém não estou utilizando o NodeJS para provisionar os recursos nem construir os códigos das aplicações.  
 A figura baixo ilustra a arquitetura do projeto conforme vai sendo evoluído.  
-![arquitetura do ecommerce](/images/arquitetura-ecommerce.svg)
+![arquitetura do ecommerce](/images/arquitetura-ecommerce-Page-1.svg)
 
 - A infraestrutura da AWS está sendo criada e automatizada utilizando o [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html). A linguagem utilizada no CDK foi o Java;
 - As funções Lambda também estão sendo desenvolvidas na linguagem Java.
 
+A comunicação acima que mostra o API Gateway com a função de WebSocket será utilizado para importação das Notas Fiscais do sistema. Abaixo está o diagrama expandido dessa parte da aplicação:
+![arquitetura do ecommerce](/images/arquitetura-ecommerce-Page-2.svg)
 
 ### Recursos/tecnologias/ferramentas utilizadas para criar o projeto
 - Java 11;
