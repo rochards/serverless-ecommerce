@@ -12,6 +12,10 @@ A figura baixo ilustra a arquitetura do projeto conforme vai sendo evoluído.
 A comunicação acima que mostra o API Gateway com a função de WebSocket será utilizado para importação das Notas Fiscais do sistema. Abaixo está o diagrama expandido dessa parte da aplicação:
 ![arquitetura do ecommerce](/images/arquitetura-ecommerce-Page-2.svg)
 
+- A Lambda `invoice-URL` entregará aos clientes as URLs assinadas do Bucket S3; 
+- O cliente envia a NFe utilizando a URL do *bucket*, sem a necessidade de outro serviço intermediando essa comunicação;
+- Após a importação do arquivo, o *bucket* se encarrega de invocar a Lambda `invoice-import` e essa realiza o processamento necessário.
+
 ### Recursos/tecnologias/ferramentas utilizadas para criar o projeto
 - Java 11;
 - Maven 3.8.6;
