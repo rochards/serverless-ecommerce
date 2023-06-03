@@ -36,19 +36,7 @@ public class InvoiceApiStack extends Stack {
                 "lambdas/invoices/websocket-disconnection-lambda-1.0-SNAPSHOT.jar"
         );
 
-        WebSocketApi webSocketApi = WebSocketApi.Builder.create(this, "InvoiceWSApi")
-                .apiName("InvoiceWebSocketApi")
-                .connectRouteOptions(
-                        WebSocketRouteOptions.builder()
-                                .integration(new WebSocketLambdaIntegration("WebSocketConnectionHandler", connectionHandler))
-                                .build()
-                )
-                .disconnectRouteOptions(
-                        WebSocketRouteOptions.builder()
-                                .integration(new WebSocketLambdaIntegration("WebSocketDisconnectionHandler", disconnectionHandler))
-                                .build()
-                )
-                .build();
+        WebSocketApi webSocketApi = createWebSocket(connectionHandler, disconnectionHandler);
 
     }
 
@@ -93,6 +81,22 @@ public class InvoiceApiStack extends Stack {
                 .runtime(Runtime.JAVA_11)
                 .logRetention(RetentionDays.ONE_DAY)
                 .tracing(Tracing.ACTIVE)
+                .build();
+    }
+
+    private WebSocketApi createWebSocket(Function connectionHandler, Function disconnectionHandler) {
+        return WebSocketApi.Builder.create(this, "InvoiceWSApi")
+                .apiName("InvoiceWebSocketApi")
+                .connectRouteOptions(
+                        WebSocketRouteOptions.builder()
+                                .integration(new WebSocketLambdaIntegration("WebSocketConnectionHandler", connectionHandler))
+                                .build()
+                )
+                .disconnectRouteOptions(
+                        WebSocketRouteOptions.builder()
+                                .integration(new WebSocketLambdaIntegration("WebSocketDisconnectionHandler", disconnectionHandler))
+                                .build()
+                )
                 .build();
     }
 }
