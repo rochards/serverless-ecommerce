@@ -6,6 +6,7 @@ import software.amazon.awscdk.services.dynamodb.Attribute;
 import software.amazon.awscdk.services.dynamodb.AttributeType;
 import software.amazon.awscdk.services.dynamodb.BillingMode;
 import software.amazon.awscdk.services.dynamodb.Table;
+import software.amazon.awscdk.services.s3.Bucket;
 import software.constructs.Construct;
 
 public class InvoiceApiStack extends Stack {
@@ -14,6 +15,7 @@ public class InvoiceApiStack extends Stack {
         super(scope, stackId, null);
 
         Table invoicesAndTransactionsDdb = createDynamoDBTable();
+        Bucket invoicesBucket = createBucket();
     }
 
     private Table createDynamoDBTable() {
@@ -36,6 +38,13 @@ public class InvoiceApiStack extends Stack {
                                 .build()
                 )
                 .timeToLiveAttribute("Ttl")
+                .build();
+    }
+
+    private Bucket createBucket() {
+        return Bucket.Builder.create(this, "InvoicesBucket")
+                .removalPolicy(RemovalPolicy.DESTROY)
+                .autoDeleteObjects(Boolean.TRUE)
                 .build();
     }
 }
