@@ -125,6 +125,36 @@ em especial, `ProductId` é do tipo String e `ProductPrice` do tipo Number.
 
 A tabela de eventos ainda vai contar com um **GSI** (Global Secondary Index) com todos os atributos da tabela principal. A _hash key_ agora será o atributo `Email` e a _sort key_ o atributo `EventTypeAndTimestamp`.
 
+#### Tabela de Invoices
+
+| Atributo                            | Tipo no DynamoDB |
+| ----------------------------------- | ---------------- |
+| `Id` (hash key)                     | String           |
+| `InvoiceName` (sort key)            | String           |
+| `ProductId`                         | String           |
+| `TransactionId`                     | String           |
+| `TotalValue`                        | Number           |
+| `CreatedAt`                         | Number           |
+| `Quantity`                          | Number           |
+| `Ttl`                               | Number           |
+
+
+ #### Tabela de Transacations
+
+| Atributo                            | Tipo no DynamoDB |
+| ----------------------------------- | ---------------- |
+| `Id` (hash key)                     | String           |
+| `TransactionId` (sort key)          | String           |
+| `Ttl`                               | Number           |
+| `RequestId`                         | String           |
+| `TransactionStatus`                 | String           |
+| `CreatedAt`                         | Number           |
+| `ExpiresIn`                         | Number           |
+| `ConnectionID`                      | String           |
+| `Endpoint`                          | String           |
+
+o atributo `ConnectionID` acima é a identificação do cliente conectado. 
+
 ### Como as lambdas estão sendo empacotadas para o deploy
 
 Dentro do projeto `cdk-infra` deve existir um diretório `lambdas` que é para onde os arquivos `.jar` das lambdas, gerados pelo comando `mvn clean package`, devem ser copiados. Exemplificando com a classe `ProductsAppStack`:
