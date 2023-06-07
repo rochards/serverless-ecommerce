@@ -5,11 +5,14 @@ import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.apigatewayv2.alpha.WebSocketApi;
 import software.amazon.awscdk.services.apigatewayv2.alpha.WebSocketRouteOptions;
+import software.amazon.awscdk.services.apigatewayv2.alpha.WebSocketStage;
 import software.amazon.awscdk.services.apigatewayv2.integrations.alpha.WebSocketLambdaIntegration;
 import software.amazon.awscdk.services.dynamodb.Attribute;
 import software.amazon.awscdk.services.dynamodb.AttributeType;
 import software.amazon.awscdk.services.dynamodb.BillingMode;
 import software.amazon.awscdk.services.dynamodb.Table;
+import software.amazon.awscdk.services.iam.Effect;
+import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
@@ -17,6 +20,8 @@ import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.constructs.Construct;
+
+import java.util.Collections;
 
 public class InvoiceApiStack extends Stack {
 
@@ -37,7 +42,16 @@ public class InvoiceApiStack extends Stack {
         );
 
         WebSocketApi webSocketApi = createWebSocket(connectionHandler, disconnectionHandler);
+        String stageName = "prod";
+        WebSocketStage.Builder.create(this, "InvoiceWSApiStage")
+                .webSocketApi(webSocketApi)
+                .stageName(stageName)
+                .autoDeploy(true)
+                .build();
 
+        Function invoiceURLHandler = configureInvoiceURLHandler(invoicesBucket, webSocketApi.getApiEndpoint(), stageName,
+                invoicesAndTransactionsDdb.getTableArn());
+        webSocketApi.grantManageConnections(invoiceURLHandler);
     }
 
     private Table createDynamoDBTable() {
@@ -98,5 +112,37 @@ public class InvoiceApiStack extends Stack {
                                 .build()
                 )
                 .build();
+    }
+
+    private Function configureInvoiceURLHandler(Bucket invoicesBucket, String webSocketApiEndpoint, String stageName,
+                                                String invoicesTableArn) {
+        Function invoiceURLHandler = createLambda("InvoiceURLLambda",
+                "com.rochards.invoices.InvoiceURLLambda",
+                "lambdas/invoices/invoice-url-lambda-1.0-SNAPSHOT.jar"
+        );
+        invoiceURLHandler.addEnvironment("BUCKET_NAME", invoicesBucket.getBucketName());
+        invoiceURLHandler.addEnvironment("INVOICE_WEBSOCKET_ENDPOINT", webSocketApiEndpoint + "/" + stageName);
+        invoiceURLHandler.addToRolePolicy(
+                /* No curso é colocada uma condicao mais granulada, porem fica trabalhoso colocar conditions em Java:
+                 * {"ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["#transaction"]}} -> indicando que essa lambda
+                 * só vai escrever na tabela com a hash key começando com #transaction. */
+                PolicyStatement.Builder.create()
+                        .effect(Effect.ALLOW)
+                        .actions(Collections.singletonList("dynamodb:PutItem"))
+                        .resources(Collections.singletonList(invoicesTableArn))
+                        .build()
+        );
+        invoiceURLHandler.addToRolePolicy(
+                PolicyStatement.Builder.create()
+                        .effect(Effect.ALLOW)
+                        /* A lambda em si nao vai fazer put no bucket, mas apenas gerar a URL para quem a tiver fazer
+                         * entao o Put. A gente precisa dar essa permissão para a Lambda para que o link tenha essa
+                         * permissão. As permissões do link do bucket serão as mesmas de quem está o chamando*/
+                        .actions(Collections.singletonList("s3:PutObject"))
+                        .resources(Collections.singletonList(invoicesBucket.getBucketArn() + "/*"))
+                        .build()
+        );
+
+        return invoiceURLHandler;
     }
 }
