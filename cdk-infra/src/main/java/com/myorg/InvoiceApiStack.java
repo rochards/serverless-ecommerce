@@ -19,17 +19,23 @@ import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.Tracing;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.s3.EventType;
+import software.amazon.awscdk.services.s3.notifications.LambdaDestination;
 import software.constructs.Construct;
 
 import java.util.Collections;
 
 public class InvoiceApiStack extends Stack {
 
+    private final Table invoicesAndTransactionsDdb;
+    private final Bucket invoicesBucket;
+    private final WebSocketApi webSocketApi;
+
     public InvoiceApiStack(Construct scope, String stackId) {
         super(scope, stackId, null);
 
-        Table invoicesAndTransactionsDdb = createDynamoDBTable();
-        Bucket invoicesBucket = createBucket();
+        invoicesAndTransactionsDdb = createDynamoDBTable();
+        invoicesBucket = createBucket();
 
         // para o WebSocket
         Function connectionHandler = createLambda("WebSocketConnectionLambda",
@@ -41,7 +47,7 @@ public class InvoiceApiStack extends Stack {
                 "lambdas/invoices/websocket-disconnection-lambda-1.0-SNAPSHOT.jar"
         );
 
-        WebSocketApi webSocketApi = createWebSocket(connectionHandler, disconnectionHandler);
+        webSocketApi = createWebSocket(connectionHandler, disconnectionHandler);
         String stageName = "prod";
         WebSocketStage.Builder.create(this, "InvoiceWSApiStage")
                 .webSocketApi(webSocketApi)
@@ -49,9 +55,8 @@ public class InvoiceApiStack extends Stack {
                 .autoDeploy(true)
                 .build();
 
-        Function invoiceURLHandler = configureInvoiceURLHandler(invoicesBucket, webSocketApi.getApiEndpoint(), stageName,
-                invoicesAndTransactionsDdb.getTableArn());
-        webSocketApi.grantManageConnections(invoiceURLHandler);
+        Function invoiceURLHandler = configureInvoiceURLHandler(stageName);
+        Function invoiceImportHandler = configureInvoiceImportHandler(stageName);
     }
 
     private Table createDynamoDBTable() {
@@ -114,14 +119,13 @@ public class InvoiceApiStack extends Stack {
                 .build();
     }
 
-    private Function configureInvoiceURLHandler(Bucket invoicesBucket, String webSocketApiEndpoint, String stageName,
-                                                String invoicesTableArn) {
+    private Function configureInvoiceURLHandler(String webSocketStageName) {
         Function invoiceURLHandler = createLambda("InvoiceURLLambda",
                 "com.rochards.invoices.InvoiceURLLambda",
                 "lambdas/invoices/invoice-url-lambda-1.0-SNAPSHOT.jar"
         );
         invoiceURLHandler.addEnvironment("BUCKET_NAME", invoicesBucket.getBucketName());
-        invoiceURLHandler.addEnvironment("INVOICE_WEBSOCKET_ENDPOINT", webSocketApiEndpoint + "/" + stageName);
+        invoiceURLHandler.addEnvironment("INVOICE_WEBSOCKET_ENDPOINT", webSocketApi.getApiEndpoint() + "/" + webSocketStageName);
         invoiceURLHandler.addToRolePolicy(
                 /* No curso é colocada uma condicao mais granulada, porem fica trabalhoso colocar conditions em Java:
                  * {"ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["#transaction"]}} -> indicando que essa lambda
@@ -129,7 +133,7 @@ public class InvoiceApiStack extends Stack {
                 PolicyStatement.Builder.create()
                         .effect(Effect.ALLOW)
                         .actions(Collections.singletonList("dynamodb:PutItem"))
-                        .resources(Collections.singletonList(invoicesTableArn))
+                        .resources(Collections.singletonList(invoicesAndTransactionsDdb.getTableArn()))
                         .build()
         );
         invoiceURLHandler.addToRolePolicy(
@@ -143,6 +147,27 @@ public class InvoiceApiStack extends Stack {
                         .build()
         );
 
+        webSocketApi.grantManageConnections(invoiceURLHandler);
+
         return invoiceURLHandler;
+    }
+
+    private Function configureInvoiceImportHandler(String webSocketStageName) {
+        Function invoiceImportHandler = createLambda("InvoiceImportLambda",
+                "com.rochards.invoices.InvoiceImportLambda",
+                "lambdas/invoices/invoice-import-lambda-1.0-SNAPSHOT.jar"
+        );
+        invoiceImportHandler.addEnvironment("INVOICE_WEBSOCKET_ENDPOINT", webSocketApi.getApiEndpoint()  + "/" + webSocketStageName);
+        invoicesAndTransactionsDdb.grantReadWriteData(invoiceImportHandler); // eu poderia criar um PolicyStatement aqui tbm
+
+        // configuração para o bucket invocar a Lambda
+        invoicesBucket.addEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(invoiceImportHandler));
+        // ao receber a notificação, a Lambda precisa acessar o bucket para manipular o objeto, então precisa de permissão para tal
+        invoicesBucket.grantDelete(invoiceImportHandler);
+        invoicesBucket.grantRead(invoiceImportHandler);
+
+        webSocketApi.grantManageConnections(invoiceImportHandler);
+
+        return invoiceImportHandler;
     }
 }
