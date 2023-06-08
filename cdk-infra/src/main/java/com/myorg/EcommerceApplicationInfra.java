@@ -23,6 +23,8 @@ public class EcommerceApplicationInfra {
         ecommerceApiGtwStack.addDependency(productsAppStack);
         ecommerceApiGtwStack.addDependency(ordersAppStack);
 
+        new InvoiceApiStack(app, "InvoiceApiStack");
+
         app.synth();
     }
 }

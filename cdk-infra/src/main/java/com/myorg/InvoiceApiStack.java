@@ -57,6 +57,8 @@ public class InvoiceApiStack extends Stack {
 
         Function invoiceURLHandler = configureInvoiceURLHandler(stageName);
         Function invoiceImportHandler = configureInvoiceImportHandler(stageName);
+
+        configureWebSocketRoutes(invoiceURLHandler);
     }
 
     private Table createDynamoDBTable() {
@@ -169,5 +171,13 @@ public class InvoiceApiStack extends Stack {
         webSocketApi.grantManageConnections(invoiceImportHandler);
 
         return invoiceImportHandler;
+    }
+
+    private void configureWebSocketRoutes(Function invoiceURLHandler) {
+        webSocketApi.addRoute("getImportURL",
+                WebSocketRouteOptions.builder()
+                        .integration(new WebSocketLambdaIntegration("GetURLHandler", invoiceURLHandler))
+                        .build()
+        );
     }
 }
