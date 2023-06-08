@@ -14,7 +14,8 @@ A comunicação acima que mostra o API Gateway com a função de WebSocket será
 
 - A Lambda `invoice-URL` entregará aos clientes as URLs assinadas do Bucket S3; 
 - O cliente envia a NFe utilizando a URL do *bucket*, sem a necessidade de outro serviço intermediando essa comunicação;
-- Após a importação do arquivo, o *bucket* se encarrega de invocar a Lambda `invoice-import` e essa realiza o processamento necessário.
+- Após a importação do arquivo, o *bucket* se encarrega de invocar a Lambda `invoice-import` e essa realiza o processamento necessário;
+- **OBS**.: não criei a lambda `cancel-import` como no diagrama do curso;
 
 ### Recursos/tecnologias/ferramentas utilizadas para criar o projeto
 - Java 11;
