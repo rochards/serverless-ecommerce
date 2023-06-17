@@ -31,17 +31,30 @@ public class InvoiceURLLambda implements RequestHandler<APIGatewayV2WebSocketEve
     }
 
     private final AmazonS3 s3Client = AmazonS3Client.builder().build();
+    private final TransactionRepository repository = new TransactionRepository();
 
     @Override
     public APIGatewayV2WebSocketResponse handleRequest(APIGatewayV2WebSocketEvent input, Context context) {
 
-        LOGGER.info("ConnectionId: {} - Lambda RequestId: {}", input.getRequestContext().getConnectionId(), context.getAwsRequestId());
+        String clientConnectionId = input.getRequestContext().getConnectionId();
+        LOGGER.info("ConnectionId: {} - Lambda RequestId: {}", clientConnectionId, context.getAwsRequestId());
 
-        var generatePresignedUrlRequest = new GeneratePresignedUrlRequest(BUCKET_NAME, UUID.randomUUID().toString())
+        String fileKey = UUID.randomUUID().toString();
+        int expirationBucketUrl = 300;
+        var generatePresignedUrlRequest = new GeneratePresignedUrlRequest(BUCKET_NAME, fileKey)
                 .withMethod(HttpMethod.PUT)
-                .withExpiration(Date.from(Instant.now().plusSeconds(300)));
+                .withExpiration(Date.from(Instant.now().plusSeconds(expirationBucketUrl)));
 
         URL presignedUrl = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+
+        TransactionModel transaction = new TransactionModel();
+        transaction.setPk("#transaction" + fileKey);
+        transaction.setSk(fileKey);
+        transaction.setTtl((long) expirationBucketUrl);
+        transaction.setClientConnectionId(clientConnectionId);
+        transaction.setStatus(TransactionModel.Status.URL_GENERATED);
+
+        repository.save(transaction);
 
         var response = new APIGatewayV2WebSocketResponse();
         response.setStatusCode(200);
